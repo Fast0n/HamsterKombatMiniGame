@@ -1,26 +1,66 @@
 body {
     display: flex;
-    flex-direction: column; /* Per gestire l'intestazione, il contenuto e il footer */
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    flex-direction: column; /* Gestisce l'intestazione, il contenuto e il footer */
+    justify-content: center; /* Centro verticale */
+    align-items: center; /* Centro orizzontale */
+    height: 100vh; /* Altezza della vista del browser */
     overflow: hidden;
     background-color: #282828;
     margin: 0; /* Rimuove il margine predefinito del body */
 }
 
 header {
-    margin-bottom: 20px; /* Spazio tra l'intestazione e la griglia */
     color: #ffffff; /* Colore del testo dell'intestazione */
+    margin-bottom: 20px; /* Spazio tra l'intestazione e il contenuto */
 }
 
 footer {
-    margin-top: 20px; /* Spazio tra la griglia e il footer */
     color: #ffffff; /* Colore del testo del footer */
+    margin-top: 20px; /* Spazio tra il contenuto e il footer */
+}
+
+.container {
+    display: flex;
+    flex-direction: column; /* Disposizione in colonna */
+    align-items: center; /* Centro orizzontale */
+    width: 100%;
+    max-width: 1200px; /* Imposta una larghezza massima per mantenere tutto centrato */
+}
+
+nav {
+    color: #f4f4f4;
+    width: 200px;
+    background: #333;
+    padding: 1em;
+    border-radius: 8px; /* Angoli arrotondati */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombra leggera */
+    margin-bottom: 20px; /* Spazio tra il menu e la griglia */
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+nav ul li {
+    padding: 0.5em;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+nav ul li:hover {
+    background: #ddd;
+    color: #333;
+}
+
+#grid-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .grid {
-    
     display: grid;
     grid-template-columns: repeat(6, 50px);
     grid-template-rows: repeat(6, 50px);
@@ -30,6 +70,8 @@ footer {
     border: 2px solid #444;
     border-radius: 3px;
 }
+
+
 
 .block {
     
@@ -94,3 +136,8 @@ footer {
 }
 
 
+.disabled {
+    color: gray;
+    pointer-events: none; /* Disabilita i clic */
+    opacity: 0.6; /* Riduce l'opacità per indicare che è disabilitato */
+}

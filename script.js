@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
         block.addEventListener('touchstart', startTouch);
     });
 
+    
     function onMouseMove(e) {
         if (!activeBlock) return;
 
