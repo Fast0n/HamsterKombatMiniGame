@@ -4,7 +4,25 @@ document.addEventListener('DOMContentLoaded', () => {
     let startX, startY, initialRowStart, initialColumnStart;
     let movingDirection = null;
 
+    function updateCountdown() {
+        const now = new Date();
+        const targetTime = new Date();
+        targetTime.setHours(21, 59, 30, 0); // 21:00:00
+        if (now > targetTime) {
+            targetTime.setDate(targetTime.getDate() + 1);
+        }
 
+        const diff = targetTime - now;
+
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        document.getElementById('countdown').innerHTML = `${hours}h ${minutes}m left until the next minigame`;
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown(); // Initial call to set the countdown immediately
     
     blocks.forEach(block => {
         const startTouch = (e) => {
@@ -99,7 +117,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 rect.bottom < otherRect.top || 
                 rect.top > otherRect.bottom)
             ) {
-                // Check if the colors are different
+                // Check if the colors are the same (for green blocks) or different
+                if (activeBlock.classList.contains('green2') && block.classList.contains('green2')) {
+                    return false; // There is overlap with another green block
+                }
                 if (activeBlock.className !== block.className) {
                     return false; // There is overlap with a block of a different color
                 }

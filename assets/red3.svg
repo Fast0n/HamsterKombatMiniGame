@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg version="1.1" viewBox="0 0 768 2048" width="1280" height="1280" xmlns="http://www.w3.org/2000/svg">
-<path transform="translate(0)" d="m0 0h768v2048h-768z" fill="#45201C"/>
-<path transform="translate(371,73)" d="m0 0h32l13 2 1 127 73-4h67l9 2v1648l-7 1-29 1h-36l-73-1-3-1 1 9v60l-1 53-5 2-31 1h-65l-6-1-3-127h-76l-55-1-6-1v-1609l1-22 2-6 25-1h110v-61l1-68 4-1 16-1z" fill="#FE2E1A"/>
-<path transform="translate(327,73)" d="m0 0h44v1l-41 1-20 1v68l-1 61-110 1-25 1-1 5-1 22-1 1609 61 1h76l1 1 2 78v49h71l31-1 4-1 1-53h1l1 42 1 14-1 3-2 1-44 3h-38l-26-1-9-1-2-43v-81h-10l-9-1-72-2h-42l-2-1-1-6-1-37v-159l1-27v-62l1-30 1-22 1-24v-69l-1-66v-58l-1-18 1-82v-28l1-74v-31l-1-100v-471l-1-68-1-7v-18l-1-6v-153l1-37 19-2 4-1 54-1 24-1 20-3 8-5 3-4 3-14 3-29 3-2 3 3v-30l-1-7v-9l2-15 1-3z" fill="#580614"/>
-<path transform="translate(308,169)" d="m0 0h1v36l-110 1-25 1-1 5-1 22-1 1609h-1l-1-5v-1517l1-108 2-8 4-2h54l78 1z" fill="#980C17"/>
-<path transform="translate(309,1882)" d="m0 0h1l1 41v49h71l31-1 4-1 1-53h1l1 42 1 14-1 3-2 1-44 3h-38l-26-1-9-1v-23l-1-30v-31h2l2 5 2 14h2z" fill="#630714"/>
-<path transform="translate(412,74)" d="m0 0h6l2 4 2 28 2 68v10l1 11 2 2h14l22-1h73l30 1 1 2v98h-1v-97l-9-1h-70l-49 3h-21l-1-4v-123z" fill="#980C17"/>
-<path transform="translate(416,71)" d="m0 0h5l3 7 1 7 1 20 1 64 1 19 8 4 5 1 34 1 68 1 24 1-1 3v-2h-103l-27 1h-9l-3-3-1-19-1-41-1-32-2-25-1-3-15-1v-1l12-1z" fill="#580614"/>
-<path transform="translate(309,1882)" d="m0 0h1l1 41v49h6v1l-10 2-5-1-2-49v-31h2l2 5 2 14h2z" fill="#980C17"/>
-<path transform="translate(171,1843)" d="m0 0 115 2v1l-55 1-31 1-20-1-9-3z" fill="#980C17"/>
-<path transform="translate(209,195)" d="m0 0h18l-4 2-9 1-5-1z" fill="#45211D"/>
+<path transform="translate(362,66)" d="m0 0h44l16 1 7 4 4 5 2 8v121l90-1 43 1 7 2 7 8 1 2 1 36v1428l-1 139-3 8-4 6-6 5-8 3-19 1h-108v125l-2 9-7 8-6 1h-69l-5-2-6-7-2-6-1-26v-101l-120-1-11-2-8-6-6-8-2-5-1-9v-1593l3-7 7-7 2-1h136v-112l1-13 4-7 6-5 2-1z" fill="#F0261D"/>
+<path transform="translate(577,267)" d="m0 0 1 3 2-1 1-2 1 1v1535l-2-3v-5h-2l-1 3h-2l-1-2v-9l-1-4 1-10-1-2-1-72v-24l-1-64-1-65v-981l1-94v-33l2-94v-11l2-29v-12l1-5v-18z" fill="#DD1816"/>
+<path transform="translate(432,1857)" d="m0 0h1v88l-1-2-2 6-1 5h-2l-1 5-1-4v-83l2-6 4-4z" fill="#DD1816"/>
+<path transform="translate(432,132)" d="m0 0h1l1 16v50h-1l-1-35-1-21z" fill="#DD1816"/>
 </svg>
