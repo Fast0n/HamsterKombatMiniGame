@@ -91,6 +91,7 @@ nav ul li:hover {
     cursor: grabbing;
 }
 
+
 .red {
     background-image: url('assets/red2.svg');
     background-size: cover;
@@ -100,6 +101,13 @@ nav ul li:hover {
     border-radius: 1.5px;
 
     
+}
+
+.arrow {
+    background-image: url('assets/arrow.svg');
+    background-size: cover;
+    background-position: center;
+    border-radius: 1.5px;
 }
 
 .red3 {
