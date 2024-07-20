@@ -1,64 +1,77 @@
 document.addEventListener('DOMContentLoaded', () => {
     const blocks = document.querySelectorAll('.block');
+    const grid = document.querySelector('.grid');
     let activeBlock = null;
     let startX, startY, initialRowStart, initialColumnStart;
     let movingDirection = null;
 
+    // Countdown
     function updateCountdown() {
         const now = new Date();
         const targetTime = new Date();
         targetTime.setHours(21, 59, 30, 0); // 21:00:00
-        if (now > targetTime) {
-            targetTime.setDate(targetTime.getDate() + 1);
-        }
+        if (now > targetTime) targetTime.setDate(targetTime.getDate() + 1);
 
         const diff = targetTime - now;
-
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-        document.getElementById('countdown').innerHTML = `${hours}h ${minutes}m left until the next minigame`;
+        document.getElementById('countdown').textContent = `${hours}h ${minutes}m left until the next minigame`;
     }
 
     setInterval(updateCountdown, 1000);
-    updateCountdown(); // Initial call to set the countdown immediately
-    
-    blocks.forEach(block => {
-        const startTouch = (e) => {
-            activeBlock = block;
-            startX = e.touches[0].clientX;
-            startY = e.touches[0].clientY;
+    updateCountdown();
 
-            const style = window.getComputedStyle(block);
-            initialRowStart = parseInt(style.getPropertyValue('grid-row-start'));
-            initialColumnStart = parseInt(style.getPropertyValue('grid-column-start'));
+    // Funzione di aggancio alla griglia
+    function snapToGrid(value, gridSize) {
+        return Math.round(value / gridSize) * gridSize;
+    }
 
-            document.addEventListener('touchmove', onTouchMove);
-            document.addEventListener('touchend', onTouchEnd);
-        };
-
-        block.addEventListener('mousedown', (e) => {
-            activeBlock = block;
-            startX = e.clientX;
-            startY = e.clientY;
-
-            const style = window.getComputedStyle(block);
-            initialRowStart = parseInt(style.getPropertyValue('grid-row-start'));
-            initialColumnStart = parseInt(style.getPropertyValue('grid-column-start'));
-
-            document.addEventListener('mousemove', onMouseMove);
-            document.addEventListener('mouseup', onMouseUp);
+    // Event listeners
+    function initEventListeners() {
+        blocks.forEach(block => {
+            block.addEventListener('mousedown', startDrag);
+            block.addEventListener('touchstart', startDrag);
         });
+    }
 
-        block.addEventListener('touchstart', startTouch);
-    });
+    function startDrag(e) {
+        activeBlock = e.currentTarget;
+        startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+        startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
 
-    function onMouseMove(e) {
+        const style = window.getComputedStyle(activeBlock);
+        initialRowStart = parseInt(style.getPropertyValue('grid-row-start'));
+        initialColumnStart = parseInt(style.getPropertyValue('grid-column-start'));
+
+        const moveEvent = e.type === 'touchstart' ? 'touchmove' : 'mousemove';
+        const endEvent = e.type === 'touchstart' ? 'touchend' : 'mouseup';
+
+        document.addEventListener(moveEvent, handleMove);
+        document.addEventListener(endEvent, handleEnd);
+    }
+
+    function handleMove(e) {
+        const x = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+        const y = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+
+        updatePosition(x, y);
+    }
+
+    function handleEnd(e) {
+        const dx = (e.type === 'touchend' ? e.changedTouches[0].clientX : e.clientX) - startX;
+        const dy = (e.type === 'touchend' ? e.changedTouches[0].clientY : e.clientY) - startY;
+
+        finalizePosition(dx, dy);
+        resetEventListeners(e.type);
+    }
+
+    function updatePosition(x, y) {
         if (!activeBlock) return;
 
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
+        const dx = x - startX;
+        const dy = y - startY;
 
         if (activeBlock.classList.contains('red') || activeBlock.classList.contains('red3')) {
             if (Math.abs(dy) > 5) {
@@ -73,56 +86,52 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function onTouchMove(e) {
+    function finalizePosition(dx, dy) {
         if (!activeBlock) return;
 
-        const dx = e.touches[0].clientX - startX;
-        const dy = e.touches[0].clientY - startY;
+        let newRowStart = initialRowStart;
+        let newColumnStart = initialColumnStart;
 
-        if (activeBlock.classList.contains('red') || activeBlock.classList.contains('red3')) {
-            if (Math.abs(dy) > 5) {
-                movingDirection = 'vertical';
-                activeBlock.style.transform = `translateY(${dy}px)`;
-            }
-        } else if (activeBlock.classList.contains('green2') || activeBlock.classList.contains('yellow')) {
-            if (Math.abs(dx) > 5) {
-                movingDirection = 'horizontal';
-                activeBlock.style.transform = `translateX(${dx}px)`;
+        if (movingDirection === 'vertical') {
+            newRowStart += Math.round(dy / 45);
+            newRowStart = snapToGrid(newRowStart, 1); // Aggancio alla griglia
+        } else if (movingDirection === 'horizontal') {
+            newColumnStart += Math.round(dx / 45);
+            newColumnStart = snapToGrid(newColumnStart, 1); // Aggancio alla griglia
+        }
+
+        // Verifica se la nuova posizione è valida
+        if (checkOverlap(newRowStart, newColumnStart)) {
+            if (movingDirection === 'vertical') {
+                activeBlock.style.gridRowStart = newRowStart;
+            } else if (movingDirection === 'horizontal') {
+                activeBlock.style.gridColumnStart = newColumnStart;
             }
         }
+
+        activeBlock.style.transform = 'none';
     }
 
     function checkOverlap(newRowStart, newColumnStart) {
         const rect = activeBlock.getBoundingClientRect();
-        const gridRect = document.querySelector('.grid').getBoundingClientRect();
+        const gridRect = grid.getBoundingClientRect();
 
-        // Check for overlap with grid boundaries
-        if (
-            rect.top < gridRect.top || 
-            rect.left < gridRect.left ||
-            rect.bottom > gridRect.bottom || 
-            rect.right > gridRect.right
-        ) {
+        if (rect.top < gridRect.top || rect.left < gridRect.left ||
+            rect.bottom > gridRect.bottom || rect.right > gridRect.right) {
             return false;
         }
 
-        // Check for overlap with other blocks of different color
         for (const block of blocks) {
             if (block === activeBlock) continue;
 
             const otherRect = block.getBoundingClientRect();
-            if (
-                !(rect.right < otherRect.left || 
-                rect.left > otherRect.right || 
-                rect.bottom < otherRect.top || 
-                rect.top > otherRect.bottom)
-            ) {
-                // Check if the colors are the same (for green blocks) or different
+            if (!(rect.right < otherRect.left || rect.left > otherRect.right ||
+                rect.bottom < otherRect.top || rect.top > otherRect.bottom)) {
                 if (activeBlock.classList.contains('green2') && block.classList.contains('green2')) {
-                    return false; // There is overlap with another green block
+                    return false;
                 }
                 if (activeBlock.className !== block.className) {
-                    return false; // There is overlap with a block of a different color
+                    return false;
                 }
             }
         }
@@ -130,67 +139,16 @@ document.addEventListener('DOMContentLoaded', () => {
         return true;
     }
 
-    function onMouseUp(e) {
-        if (!activeBlock) return;
+    function resetEventListeners(eventType) {
+        const moveEvent = eventType === 'touchend' ? 'touchmove' : 'mousemove';
+        const endEvent = eventType === 'touchend' ? 'touchend' : 'mouseup';
 
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
+        document.removeEventListener(moveEvent, handleMove);
+        document.removeEventListener(endEvent, handleEnd);
 
-        let newRowStart = initialRowStart;
-        let newColumnStart = initialColumnStart;
-
-        if (movingDirection === 'vertical') {
-            newRowStart += Math.round(dy / 55);
-            newRowStart = Math.max(1, Math.min(newRowStart, 6));
-        } else if (movingDirection === 'horizontal') {
-            newColumnStart += Math.round(dx / 55);
-            newColumnStart = Math.max(1, Math.min(newColumnStart, 6));
-        }
-
-        if (checkOverlap(newRowStart, newColumnStart)) {
-            if (movingDirection === 'vertical') {
-                activeBlock.style.gridRowStart = newRowStart;
-            } else if (movingDirection === 'horizontal') {
-                activeBlock.style.gridColumnStart = newColumnStart;
-            }
-        }
-
-        activeBlock.style.transform = 'none';
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
         activeBlock = null;
         movingDirection = null;
     }
 
-    function onTouchEnd(e) {
-        if (!activeBlock) return;
-
-        const dx = e.changedTouches[0].clientX - startX;
-        const dy = e.changedTouches[0].clientY - startY;
-
-        let newRowStart = initialRowStart;
-        let newColumnStart = initialColumnStart;
-
-        if (movingDirection === 'vertical') {
-            newRowStart += Math.round(dy / 55);
-            newRowStart = Math.max(1, Math.min(newRowStart, 6));
-        } else if (movingDirection === 'horizontal') {
-            newColumnStart += Math.round(dx / 55);
-            newColumnStart = Math.max(1, Math.min(newColumnStart, 6));
-        }
-
-        if (checkOverlap(newRowStart, newColumnStart)) {
-            if (movingDirection === 'vertical') {
-                activeBlock.style.gridRowStart = newRowStart;
-            } else if (movingDirection === 'horizontal') {
-                activeBlock.style.gridColumnStart = newColumnStart;
-            }
-        }
-
-        activeBlock.style.transform = 'none';
-        document.removeEventListener('touchmove', onTouchMove);
-        document.removeEventListener('touchend', onTouchEnd);
-        activeBlock = null;
-        movingDirection = null;
-    }
+    initEventListeners();
 });
