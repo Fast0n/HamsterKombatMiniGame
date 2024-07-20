@@ -23,7 +23,20 @@
             </ul>
         </nav>
         <div id="grid-container">
-            <!-- Il contenuto del grid sarà caricato qui -->
+            <div class="grid">
+                <div class="block red vertical" style="grid-row: 1 / span 2; grid-column: 2;"></div>
+                <div class="block green2 horizontal" style="grid-row: 2; grid-column: 3 / span 2;"></div>
+                <div class="block yellow horizontal key" style="grid-row: 3; grid-column: 1 / span 2;"></div>
+                <div class="block red3 vertical" style="grid-row: 1 / span 3; grid-column: 5;"></div>
+                <div class="block red vertical" style="grid-row: 4 / span 2; grid-column: 6;"></div>
+                <div class="block red vertical" style="grid-row: 3 / span 2; grid-column: 3;"></div>
+                <div class="block red vertical" style="grid-row: 5 / span 2; grid-column: 4;"></div>
+                <div class="block green2 horizontal" style="grid-row: 4; grid-column: 4 / span 2;"></div>
+                <div class="block red3 vertical" style="grid-row: 4 / span 3; grid-column: 1;"></div>
+                <div class="block green2 horizontal" style="grid-row: 5; grid-column: 2 / span 2;"></div>
+                <div class="block green2 horizontal" style="grid-row: 6; grid-column: 2 / span 2;"></div>
+                <div class="block green2 horizontal" style="grid-row: 6; grid-column: 5 / span 2;"></div>
+            </div>
         </div>
     </div>
     <footer>
@@ -31,40 +44,6 @@
     </footer>
     
     <script src="script.js"></script>
-    <script>
-        // Funzione per caricare il contenuto del file grid.html
-        function loadGrid(level) {
-            const fileName = `level/${level}.html`;
-            fetch(fileName)
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById('grid-container').innerHTML = data;
-                })
-                .catch(error => console.error('Errore nel caricamento del grid:', error));
-        }
-    
-        // Carica il grid al caricamento della pagina
-        document.addEventListener('DOMContentLoaded', () => {
-            // Trova il primo elemento della lista dei livelli
-            const firstLevelItem = document.querySelector('#levelList li');
-            if (firstLevelItem) {
-                // Ottieni il livello dal primo elemento della lista
-                const level = firstLevelItem.getAttribute('data-level');
-                
-                // Carica il contenuto per il primo livello
-                loadGrid(level);
-    
-                // Aggiungi event listener a tutti gli elementi della lista dei livelli
-                document.querySelectorAll('#levelList li').forEach(item => {
-                    item.addEventListener('click', () => {
-                        const level = item.getAttribute('data-level');
-                       
-                        loadGrid(level);
-                    });
-                });
-            }
-        });
-    </script>
     
 </body>
 

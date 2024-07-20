@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let movingDirection = null;
 
 
+    
     blocks.forEach(block => {
         const startTouch = (e) => {
             activeBlock = block;
@@ -35,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
         block.addEventListener('touchstart', startTouch);
     });
 
-    
     function onMouseMove(e) {
         if (!activeBlock) return;
 
@@ -80,9 +80,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Check for overlap with grid boundaries
         if (
-            rect.top < gridRect.top ||
+            rect.top < gridRect.top || 
             rect.left < gridRect.left ||
-            rect.bottom > gridRect.bottom ||
+            rect.bottom > gridRect.bottom || 
             rect.right > gridRect.right
         ) {
             return false;
@@ -94,10 +94,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const otherRect = block.getBoundingClientRect();
             if (
-                !(rect.right < otherRect.left ||
-                    rect.left > otherRect.right ||
-                    rect.bottom < otherRect.top ||
-                    rect.top > otherRect.bottom)
+                !(rect.right < otherRect.left || 
+                rect.left > otherRect.right || 
+                rect.bottom < otherRect.top || 
+                rect.top > otherRect.bottom)
             ) {
                 // Check if the colors are different
                 if (activeBlock.className !== block.className) {
