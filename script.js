@@ -1,154 +1,259 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const blocks = document.querySelectorAll('.block');
-    const grid = document.querySelector('.grid');
-    let activeBlock = null;
-    let startX, startY, initialRowStart, initialColumnStart;
-    let movingDirection = null;
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const bufferCanvas = document.createElement('canvas');
+const bufferCtx = bufferCanvas.getContext('2d');
 
-    // Countdown
-    function updateCountdown() {
-        const now = new Date();
-        const targetTime = new Date();
-        targetTime.setHours(21, 59, 30, 0); // 21:00:00
-        if (now > targetTime) targetTime.setDate(targetTime.getDate() + 1);
+const gridSize = 6;
+const cellSize = canvas.width / gridSize;
 
-        const diff = targetTime - now;
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+document.addEventListener('DOMContentLoaded', (event) => {
+    const levelItems = document.querySelectorAll('#levelList li');
 
-        document.getElementById('countdown').textContent = `${hours}h ${minutes}m left until the next minigame`;
-    }
-
-    setInterval(updateCountdown, 1000);
-    updateCountdown();
-
-    // Funzione di aggancio alla griglia
-    function snapToGrid(value, gridSize) {
-        return Math.round(value / gridSize) * gridSize;
-    }
-
-    // Event listeners
-    function initEventListeners() {
-        blocks.forEach(block => {
-            block.addEventListener('mousedown', startDrag);
-            block.addEventListener('touchstart', startDrag);
+    levelItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const level = item.getAttribute('data-level');
+                // Carica dinamicamente il file JavaScript
+                const script = document.createElement('script');
+                script.src = `level/${level}.js`;
+                script.onload = () => {
+                    // Quando il file è caricato, ricarica il canvas
+                    drawGame();
+                };
+                document.head.appendChild(script);
+            
         });
-    }
-
-    function startDrag(e) {
-        activeBlock = e.currentTarget;
-        startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-        startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-
-        const style = window.getComputedStyle(activeBlock);
-        initialRowStart = parseInt(style.getPropertyValue('grid-row-start'));
-        initialColumnStart = parseInt(style.getPropertyValue('grid-column-start'));
-
-        const moveEvent = e.type === 'touchstart' ? 'touchmove' : 'mousemove';
-        const endEvent = e.type === 'touchstart' ? 'touchend' : 'mouseup';
-
-        document.addEventListener(moveEvent, handleMove);
-        document.addEventListener(endEvent, handleEnd);
-    }
-
-    function handleMove(e) {
-        const x = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-        const y = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
-
-        updatePosition(x, y);
-    }
-
-    function handleEnd(e) {
-        const dx = (e.type === 'touchend' ? e.changedTouches[0].clientX : e.clientX) - startX;
-        const dy = (e.type === 'touchend' ? e.changedTouches[0].clientY : e.clientY) - startY;
-
-        finalizePosition(dx, dy);
-        resetEventListeners(e.type);
-    }
-
-    function updatePosition(x, y) {
-        if (!activeBlock) return;
-
-        const dx = x - startX;
-        const dy = y - startY;
-
-        if (activeBlock.classList.contains('red') || activeBlock.classList.contains('red3')) {
-            if (Math.abs(dy) > 5) {
-                movingDirection = 'vertical';
-                activeBlock.style.transform = `translateY(${dy}px)`;
-            }
-        } else if (activeBlock.classList.contains('green2') || activeBlock.classList.contains('yellow')) {
-            if (Math.abs(dx) > 5) {
-                movingDirection = 'horizontal';
-                activeBlock.style.transform = `translateX(${dx}px)`;
-            }
-        }
-    }
-
-    function finalizePosition(dx, dy) {
-        if (!activeBlock) return;
-
-        let newRowStart = initialRowStart;
-        let newColumnStart = initialColumnStart;
-
-        if (movingDirection === 'vertical') {
-            newRowStart += Math.round(dy / 45);
-            newRowStart = snapToGrid(newRowStart, 1); // Aggancio alla griglia
-        } else if (movingDirection === 'horizontal') {
-            newColumnStart += Math.round(dx / 45);
-            newColumnStart = snapToGrid(newColumnStart, 1); // Aggancio alla griglia
-        }
-
-        // Verifica se la nuova posizione è valida
-        if (checkOverlap(newRowStart, newColumnStart)) {
-            if (movingDirection === 'vertical') {
-                activeBlock.style.gridRowStart = newRowStart;
-            } else if (movingDirection === 'horizontal') {
-                activeBlock.style.gridColumnStart = newColumnStart;
-            }
-        }
-
-        activeBlock.style.transform = 'none';
-    }
-
-    function checkOverlap(newRowStart, newColumnStart) {
-        const rect = activeBlock.getBoundingClientRect();
-        const gridRect = grid.getBoundingClientRect();
-
-        if (rect.top < gridRect.top || rect.left < gridRect.left ||
-            rect.bottom > gridRect.bottom || rect.right > gridRect.right) {
-            return false;
-        }
-
-        for (const block of blocks) {
-            if (block === activeBlock) continue;
-
-            const otherRect = block.getBoundingClientRect();
-            if (!(rect.right < otherRect.left || rect.left > otherRect.right ||
-                rect.bottom < otherRect.top || rect.top > otherRect.bottom)) {
-                if (activeBlock.classList.contains('green2') && block.classList.contains('green2')) {
-                    return false;
-                }
-                if (activeBlock.className !== block.className) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    function resetEventListeners(eventType) {
-        const moveEvent = eventType === 'touchend' ? 'touchmove' : 'mousemove';
-        const endEvent = eventType === 'touchend' ? 'touchend' : 'mouseup';
-
-        document.removeEventListener(moveEvent, handleMove);
-        document.removeEventListener(endEvent, handleEnd);
-
-        activeBlock = null;
-        movingDirection = null;
-    }
-
-    initEventListeners();
+    });
 });
+
+
+const images = {};
+
+function svgToDataURL(svg) {
+    return 'data:image/svg+xml;base64,' + btoa(svg);
+}
+
+function loadSVGs(callback) {
+    let loadedCount = 0;
+    const totalToLoad = Object.keys(svgFiles).length;
+
+    for (const color in svgFiles) {
+        images[color] = new Image();
+        images[color].src = svgToDataURL(svgFiles[color]);
+        images[color].onload = () => {
+            loadedCount++;
+            if (loadedCount === totalToLoad) {
+                callback();
+            }
+        };
+    }
+}
+
+let blocks = [
+    { x: 0, y: 0, color: 'red', width: 1, height: 2 },
+    { x: 1, y: 0, color: 'green', width: 2, height: 1 },
+    { x: 3, y: 1, color: 'green', width: 2, height: 1 },
+    { x: 4, y: 0, color: 'green', width: 2, height: 1 },
+    { x: 0, y: 2, color: 'key', width: 2, height: 1 },
+    { x: 3, y: 2, color: 'red2', width: 1, height: 3 },
+    { x: 5, y: 1, color: 'red', width: 1, height: 2 },
+    { x: 2, y: 3, color: 'red', width: 1, height: 2 },
+    { x: 4, y: 3, color: 'green', width: 2, height: 1 },
+    { x: 1, y: 3, color: 'red2', width: 1, height: 3 },
+    { x: 2, y: 5, color: 'green', width: 2, height: 1 },
+    { x: 4, y: 4, color: 'red', width: 1, height: 2 },
+]
+
+let selectedBlock = null;
+let initialX = 0;
+let initialY = 0;
+let startTime = null;
+let animationFrameId = null;
+
+bufferCanvas.width = canvas.width;
+bufferCanvas.height = canvas.height;
+
+function updateCountdown() {
+    const now = new Date();
+    const targetTime = new Date();
+    targetTime.setHours(21, 59, 30, 0);
+    if (now > targetTime) targetTime.setDate(targetTime.getDate() + 1);
+
+    const diff = targetTime - now;
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    document.getElementById('countdown').textContent = `${hours}h ${minutes}m left until the next minigame`;
+}
+
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+function drawBlock(ctx, x, y, width, height, color) {
+    const img = images[color];
+    ctx.drawImage(img, x * cellSize, y * cellSize, width * cellSize, height * cellSize);
+}
+
+function drawGame() {
+    bufferCtx.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
+    bufferCtx.fillStyle = '#242424';
+    bufferCtx.fillRect(0, 0, bufferCanvas.width, bufferCanvas.height);
+
+    blocks.forEach(block => {
+        drawBlock(bufferCtx, block.x, block.y, block.width, block.height, block.color);
+    });
+
+    bufferCtx.strokeStyle = '#2c2c2c';
+    bufferCtx.lineWidth = 1;
+
+    for (let i = 0; i <= gridSize; i++) {
+        bufferCtx.beginPath();
+        bufferCtx.moveTo(i * cellSize, 0);
+        bufferCtx.lineTo(i * cellSize, canvas.height);
+        bufferCtx.stroke();
+    }
+
+    for (let i = 0; i <= gridSize; i++) {
+        bufferCtx.beginPath();
+        bufferCtx.moveTo(0, i * cellSize);
+        bufferCtx.lineTo(canvas.width, i * cellSize);
+        bufferCtx.stroke();
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(bufferCanvas, 0, 0);
+}
+
+function getBlockAt(x, y) {
+    return blocks.find(block => x >= block.x && x < block.x + block.width && y >= block.y && y < block.y + block.height);
+}
+
+function canMoveBlock(block, dx, dy) {
+    const newX = block.x + dx;
+    const newY = block.y + dy;
+    for (let x = newX; x < newX + block.width; x++) {
+        for (let y = newY; y < newY + block.height; y++) {
+            if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) {
+                return false;
+            }
+            if (getBlockAt(x, y) && getBlockAt(x, y) !== block) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+function easeInOutCubic(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+let win = false;
+function animateMove(block, startX, startY, endX, endY, startTime) {
+    function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        const progress = Math.min(elapsed , 1); // Modifica la durata qui
+        const easedProgress = easeInOutCubic(progress);
+
+        const dx = (endX - startX) * easedProgress;
+        const dy = (endY - startY) * easedProgress;
+
+        block.x = Math.round(startX + dx);
+        block.y = Math.round(startY + dy);
+
+        drawGame();
+
+        if (progress < 1) {
+            animationFrameId = requestAnimationFrame(step);
+        } else {
+            block.x = endX;
+            block.y = endY;
+            drawGame();
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+
+            if (block.color === 'key') {
+                console.log(`Key block coordinates: x=${block.x}, y=${block.y}`);
+                if (block.x === 4 && block.y === 2) {
+                    canvas.removeEventListener('mousedown', startDrag);
+                    canvas.removeEventListener('mousemove', drag);
+                    canvas.removeEventListener('mouseup', endDrag);
+                    canvas.removeEventListener('touchstart', startDrag);
+                    canvas.removeEventListener('touchmove', drag);
+                    canvas.removeEventListener('touchend', endDrag);
+                    if (win == false){
+                        alert('Hai vinto');
+                        win = true
+                    }
+                }
+            }
+        }
+    }
+
+    requestAnimationFrame(step);
+}
+
+function moveBlock(block, dx, dy) {
+    const newX = block.x + dx;
+    const newY = block.y + dy;
+    if (canMoveBlock(block, dx, dy)) {
+        animateMove(block, block.x, block.y, newX, newY, performance.now());
+    }
+}
+
+function startDrag(event) {
+    const rect = canvas.getBoundingClientRect();
+    let x, y;
+
+    if (event.touches) {
+        x = Math.floor((event.touches[0].clientX - rect.left) / cellSize);
+        y = Math.floor((event.touches[0].clientY - rect.top) / cellSize);
+    } else {
+        x = Math.floor((event.clientX - rect.left) / cellSize);
+        y = Math.floor((event.clientY - rect.top) / cellSize);
+    }
+
+    selectedBlock = getBlockAt(x, y);
+    if (selectedBlock) {
+        initialX = x - selectedBlock.x;
+        initialY = y - selectedBlock.y;
+    }
+}
+
+function drag(event) {
+    if (selectedBlock) {
+        const rect = canvas.getBoundingClientRect();
+        let x, y;
+
+        if (event.touches) {
+            x = Math.floor((event.touches[0].clientX - rect.left) / cellSize);
+            y = Math.floor((event.touches[0].clientY - rect.top) / cellSize);
+        } else {
+            x = Math.floor((event.clientX - rect.left) / cellSize);
+            y = Math.floor((event.clientY - rect.top) / cellSize);
+        }
+
+        const dx = x - initialX - selectedBlock.x;
+        const dy = y - initialY - selectedBlock.y;
+
+        if (selectedBlock.color === 'red' || selectedBlock.color === 'red2' && dx === 0) {
+            moveBlock(selectedBlock, 0, dy);
+        } else if ((selectedBlock.color === 'green' || selectedBlock.color === 'key') && dy === 0) {
+            moveBlock(selectedBlock, dx, 0);
+        }
+    }
+}
+
+function endDrag() {
+    selectedBlock = null;
+}
+
+canvas.addEventListener('mousedown', startDrag);
+canvas.addEventListener('mousemove', drag);
+canvas.addEventListener('mouseup', endDrag);
+canvas.addEventListener('touchstart', startDrag);
+canvas.addEventListener('touchmove', drag);
+canvas.addEventListener('touchend', endDrag);
+
+loadSVGs(drawGame);
