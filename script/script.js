@@ -6,6 +6,7 @@ const bufferCtx = bufferCanvas.getContext('2d');
 const gridSize = 6;
 const cellSize = canvas.width / gridSize;
 
+
 document.addEventListener('DOMContentLoaded', (event) => {
     const levelItems = document.querySelectorAll('#levelList li');
 
@@ -42,6 +43,48 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+// Funzione per ottenere la data in formato YYYY-MM-DD
+function formatDateSlash(date) {
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    return `${year}-${month}-${day}`;
+}
+
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    return `${year}${month}${day}`;
+}
+
+// Ottenere le date di due giorni fa, ieri e oggi
+const today = new Date();
+const tomorrow = new Date(today);
+tomorrow.setDate(today.getDate() + 1);
+const twoDaysAgo = new Date(today);
+twoDaysAgo.setDate(today.getDate() - 1);
+
+// Formattare le date
+const formattedToday_ = formatDateSlash(today);
+const formattedTomorrow_ = formatDateSlash(tomorrow);
+const formattedTwoDaysAgo_ = formatDateSlash(twoDaysAgo);
+
+const formattedToday = formatDate(today);
+const formattedTomorrow = formatDate(tomorrow);
+const formattedTwoDaysAgo = formatDate(twoDaysAgo);
+
+// Creare gli elementi della lista
+const levelList = document.getElementById('levelList');
+levelList.innerHTML = `
+    <li data-level="${formattedTwoDaysAgo}">Level ${formattedTwoDaysAgo_}</li>
+    <li data-level="${formattedToday}">Level ${formattedToday_}</li>
+    <li data-level="${formattedTomorrow}" class="active">Level ${formattedTomorrow_}</li>
+    <br>
+    <div class="countdown" id="countdown"></div>
+`;
+
+
 const images = {};
 
 function svgToDataURL(svg) {
@@ -64,20 +107,7 @@ function loadSVGs(callback) {
     }
 }
 
-let blocks = [
-    { x: 0, y: 0, color: 'red', width: 1, height: 2 },
-    { x: 1, y: 0, color: 'green', width: 2, height: 1 },
-    { x: 3, y: 1, color: 'green', width: 2, height: 1 },
-    { x: 4, y: 0, color: 'green', width: 2, height: 1 },
-    { x: 0, y: 2, color: 'key', width: 2, height: 1 },
-    { x: 3, y: 2, color: 'red2', width: 1, height: 3 },
-    { x: 5, y: 1, color: 'red', width: 1, height: 2 },
-    { x: 2, y: 1, color: 'red', width: 1, height: 2 },
-    { x: 4, y: 3, color: 'green', width: 2, height: 1 },
-    { x: 1, y: 3, color: 'red2', width: 1, height: 3 },
-    { x: 2, y: 5, color: 'green', width: 2, height: 1 },
-    { x: 4, y: 4, color: 'red', width: 1, height: 2 },
-]
+let blocks = []
 
 let selectedBlock = null;
 let initialX = 0;
@@ -99,7 +129,7 @@ function updateCountdown() {
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-    document.getElementById('countdown').textContent = `${hours}h ${minutes}m left until the next minigame`;
+    document.getElementById('countdown').textContent = `${hours}h ${minutes}m left until the next mini game`;
 }
 
 setInterval(updateCountdown, 1000);
@@ -273,3 +303,5 @@ canvas.addEventListener('touchmove', drag);
 canvas.addEventListener('touchend', endDrag);
 
 loadSVGs(drawGame);
+
+
