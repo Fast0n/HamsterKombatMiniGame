@@ -25,6 +25,22 @@ document.addEventListener('DOMContentLoaded', (event) => {
     });
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+    const levelList = document.getElementById('levelList');
+    const items = levelList.getElementsByTagName('li');
+
+    for (let item of items) {
+        item.addEventListener('click', () => {
+            // Rimuovi la classe 'active' da tutti gli elementi
+            for (let i of items) {
+                i.classList.remove('active');
+            }
+            // Aggiungi la classe 'active' all'elemento cliccato
+            item.classList.add('active');
+        });
+    }
+});
+
 
 const images = {};
 

@@ -1,88 +1,89 @@
-/* style.css */
 body {
     font-family: 'Roboto', sans-serif;
     display: flex;
     flex-direction: column;
-   /* Gestisce l'intestazione, il contenuto e il footer */
     justify-content: center;
-   /* Centro verticale */
     align-items: center;
-   /* Centro orizzontale */
     height: 100vh;
-   /* Altezza della vista del browser */
     background-color: #282828;
     margin: 0;
-   /* Rimuove il margine predefinito del body */
-    overflow: hidden 
+    overflow: hidden;
 }
-/* Impedire la selezione del testo */
+
 #levelList li {
     user-select: none;
-   /* Per la maggior parte dei browser */
     -webkit-user-select: none;
-   /* Per Safari e Chrome */
     -moz-user-select: none;
-   /* Per Firefox */
     -ms-user-select: none;
-   /* Per Internet Explorer e Edge */
-}
-/* Facoltativo: stile per il cursore sul passaggio del mouse */
-#levelList li {
     cursor: pointer;
-   /* Mostra il cursore a mano quando si passa sopra l'elemento */
 }
+
+#levelList li:hover {
+    color: inherit; 
+    background-color: inherit; 
+}
+
+#levelList li.active {
+    background-color: #ddd; /* Colore di evidenziazione */
+    color: #000000; /* Colore del testo evidenziato */
+}
+
 .game-container {
     text-align: center;
     border-radius: 8px;
     color: white;
 }
+
 canvas {
     background: #fff;
     display: block;
     margin: 0 auto;
 }
+
 .info-panel {
     margin-top: 20px;
 }
+
 footer {
     margin-top: 20px;
 }
+
 footer a {
     color: #f80;
     text-decoration: none;
 }
+
 footer a:hover {
     text-decoration: underline;
 }
+
 nav {
     color: #f4f4f4;
     background: #4d4d4d;
     padding: 1em;
     border-radius: 8px;
-   /* Angoli arrotondati */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-   /* Ombra leggera */
     margin-bottom: 20px;
-   /* Spazio tra il menu e la griglia */
 }
+
 nav ul {
     list-style: none;
     padding: 0;
     margin: 0;
 }
+
 nav ul li {
     padding: 0.5em;
-    cursor: pointer;
     border-radius: 4px;
 }
+
 nav ul li:hover {
     background: #ddd;
     color: #8d8d8d;
 }
+
 .disabled {
     color: gray;
     pointer-events: none;
-   /* Disabilita i clic */
     opacity: 0.6;
-   /* Riduce l'opacità per indicare che è disabilitato */
 }
