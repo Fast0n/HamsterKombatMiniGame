@@ -28,6 +28,26 @@ body {
     color: #000000; /* Colore del testo evidenziato */
 }
 
+
+#levelListHistory li {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    cursor: pointer;
+}
+
+#levelListHistory li:hover {
+    color: inherit; 
+    background-color: inherit; 
+}
+
+#levelListHistory li.active {
+    background-color: #ddd; /* Colore di evidenziazione */
+    color: #000000; /* Colore del testo evidenziato */
+}
+
+
 .game-container {
     text-align: center;
     border-radius: 8px;

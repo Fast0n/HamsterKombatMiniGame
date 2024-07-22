@@ -8,6 +8,45 @@ const cellSize = canvas.width / gridSize;
 
 document.addEventListener('DOMContentLoaded', function () {
 
+
+    function fetchJsFiles() {
+        fetch('list_js_files.php')
+            .then(response => response.text()) // Utilizza text() invece di json() perché stiamo ottenendo HTML
+            .then(html => {
+                document.getElementById('navLevelList').innerHTML = html;
+                setInterval(updateCountdown, 1000);
+                updateCountdown();
+
+                const levelItems = document.querySelectorAll('#levelList li');
+
+                levelItems.forEach(item => {
+                    item.addEventListener('click', () => {
+                        const level = item.getAttribute('data-level');
+                        // Carica dinamicamente il file JavaScript
+                        const script = document.createElement('script');
+                        script.src = `${level}.js`;
+                        script.onload = () => {
+                            // Quando il file è caricato, ricarica il canvas
+                            drawGame();
+                        };
+                        document.head.appendChild(script);
+            
+                        // Rimuovi la classe 'active' da tutti gli elementi
+                        levelItems.forEach(i => {
+                            i.classList.remove('active');
+                        });
+                        // Aggiungi la classe 'active' all'elemento cliccato
+                        item.classList.add('active');
+                    });
+                });
+
+            })
+            .catch(error => console.error('Error fetching JS files:', error));
+    }
+    
+    fetchJsFiles();
+
+
     function updateCountdown() {
         const now = new Date();
         const targetTime = new Date();
@@ -23,78 +62,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    function formatDate(date) {
-        const year = date.getFullYear();
-        const month = ('0' + (date.getMonth() + 1)).slice(-2);
-        const day = ('0' + date.getDate()).slice(-2);
-        return `${year}-${month}-${day}`;
-    }
+   
+    
 
-    function setLevel() {
-        // Ottenere le date di due giorni fa, ieri e oggi
-        const today = new Date();
-        const tomorrow = new Date(today);
-        const twoDaysAgo = new Date(today);
+    
 
-
-        if (new Date().getHours() >= 22 || new Date().getHours() < 1) {
-            today.setDate(today.getDate() + 1);
-            tomorrow.setDate(today.getDate() + 1);
-            twoDaysAgo.setDate(today.getDate() - 1);
-        } else {
-            tomorrow.setDate(today.getDate() + 1);
-            twoDaysAgo.setDate(today.getDate() - 1);
-        }
-
-        // Formattare le date
-        const formattedToday_ = formatDate(today);
-        const formattedTomorrow_ = formatDate(tomorrow);
-        const formattedTwoDaysAgo_ = formatDate(twoDaysAgo);
-
-        const formattedToday = formatDate(today).replace(/-/g, '');
-        const formattedTomorrow = formatDate(tomorrow).replace(/-/g, '');
-        const formattedTwoDaysAgo = formatDate(twoDaysAgo).replace(/-/g, '');
-
-        // Creare gli elementi della lista
-        const levelList = document.getElementById('levelList');
-        levelList.innerHTML = `
-            <li data-level="${formattedTwoDaysAgo}">Level ${formattedTwoDaysAgo_}</li>
-            <li data-level="${formattedToday}" class="active" >Level ${formattedToday_}</li>
-            <li data-level="${formattedTomorrow}"class="disabled" >Level ${formattedTomorrow_}</li>
-
-            <br>
-            <div class="countdown" id="countdown"></div>
-        `;
-    }
-
-    setInterval(updateCountdown, 1000);
-    updateCountdown();
-    setLevel();
-
-    const levelItems = document.querySelectorAll('#levelList li');
-
-    levelItems.forEach(item => {
-        item.addEventListener('click', () => {
-            const level = item.getAttribute('data-level');
-            // Carica dinamicamente il file JavaScript
-            const script = document.createElement('script');
-            script.src = `level/${level}.js`;
-            script.onload = () => {
-                // Quando il file è caricato, ricarica il canvas
-                drawGame();
-            };
-            document.head.appendChild(script);
-
-            // Rimuovi la classe 'active' da tutti gli elementi
-            levelItems.forEach(i => {
-                i.classList.remove('active');
-            });
-            // Aggiungi la classe 'active' all'elemento cliccato
-            item.classList.add('active');
-        });
-    });
 
 });
+
+
 
 
 

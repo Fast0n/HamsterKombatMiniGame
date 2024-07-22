@@ -6,95 +6,6 @@ const bufferCtx = bufferCanvas.getContext('2d');
 const gridSize = 6;
 const cellSize = canvas.width / gridSize;
 
-document.addEventListener('DOMContentLoaded', function () {
-
-    function updateCountdown() {
-        const now = new Date();
-        const targetTime = new Date();
-        targetTime.setHours(21, 59, 30, 0);
-        if (now > targetTime) targetTime.setDate(targetTime.getDate() + 1);
-    
-        const diff = targetTime - now;
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    
-        document.getElementById('countdown').textContent = `${hours}h ${minutes}m left until the next mini game`;
-    }
-
-
-    function formatDate(date) {
-        const year = date.getFullYear();
-        const month = ('0' + (date.getMonth() + 1)).slice(-2);
-        const day = ('0' + date.getDate()).slice(-2);
-        return `${year}-${month}-${day}`;
-    }
-
-    function setLevel() {
-        // Ottenere le date di due giorni fa, ieri e oggi
-        const today = new Date();
-        const tomorrow = new Date(today);
-        const twoDaysAgo = new Date(today);
-
-
-        if (new Date().getHours() >= 22 || new Date().getHours() < 1) {
-            today.setDate(today.getDate() + 1);
-            tomorrow.setDate(today.getDate() + 1);
-            twoDaysAgo.setDate(today.getDate() - 1);
-        } else {
-            tomorrow.setDate(today.getDate() + 1);
-            twoDaysAgo.setDate(today.getDate() - 1);
-        }
-
-        // Formattare le date
-        const formattedToday_ = formatDate(today);
-        const formattedTomorrow_ = formatDate(tomorrow);
-        const formattedTwoDaysAgo_ = formatDate(twoDaysAgo);
-
-        const formattedToday = formatDate(today).replace(/-/g, '');
-        const formattedTomorrow = formatDate(tomorrow).replace(/-/g, '');
-        const formattedTwoDaysAgo = formatDate(twoDaysAgo).replace(/-/g, '');
-
-        // Creare gli elementi della lista
-        const levelList = document.getElementById('levelList');
-        levelList.innerHTML = `
-            <li data-level="${formattedTwoDaysAgo}">Level ${formattedTwoDaysAgo_}</li>
-            <li data-level="${formattedToday}" class="active" >Level ${formattedToday_}</li>
-            <li data-level="${formattedTomorrow}"class="disabled" >Level ${formattedTomorrow_}</li>
-
-            <br>
-            <div class="countdown" id="countdown"></div>
-        `;
-    }
-
-    setInterval(updateCountdown, 1000);
-    updateCountdown();
-    setLevel();
-
-    const levelItems = document.querySelectorAll('#levelList li');
-
-    levelItems.forEach(item => {
-        item.addEventListener('click', () => {
-            const level = item.getAttribute('data-level');
-            // Carica dinamicamente il file JavaScript
-            const script = document.createElement('script');
-            script.src = `level/${level}.js`;
-            script.onload = () => {
-                // Quando il file è caricato, ricarica il canvas
-                drawGame();
-            };
-            document.head.appendChild(script);
-
-            // Rimuovi la classe 'active' da tutti gli elementi
-            levelItems.forEach(i => {
-                i.classList.remove('active');
-            });
-            // Aggiungi la classe 'active' all'elemento cliccato
-            item.classList.add('active');
-        });
-    });
-
-});
 
 
 
@@ -221,20 +132,7 @@ function animateMove(block, startX, startY, endX, endY, startTime) {
             cancelAnimationFrame(animationFrameId);
             animationFrameId = null;
 
-            if (block.color === 'key') {
-                if (block.x === 4 && block.y === 2) {
-                    canvas.removeEventListener('mousedown', startDrag);
-                    canvas.removeEventListener('mousemove', drag);
-                    canvas.removeEventListener('mouseup', endDrag);
-                    canvas.removeEventListener('touchstart', startDrag);
-                    canvas.removeEventListener('touchmove', drag);
-                    canvas.removeEventListener('touchend', endDrag);
-                    if (win == false) {
-                        alert('Hai vinto');
-                        win = true
-                    }
-                }
-            }
+            
         }
     }
 
@@ -244,9 +142,9 @@ function animateMove(block, startX, startY, endX, endY, startTime) {
 function moveBlock(block, dx, dy) {
     const newX = block.x + dx;
     const newY = block.y + dy;
-    if (canMoveBlock(block, dx, dy)) {
+    
         animateMove(block, block.x, block.y, newX, newY, performance.now());
-    }
+    
 }
 
 function startDrag(event) {
@@ -284,9 +182,9 @@ function drag(event) {
         const dx = x - initialX - selectedBlock.x;
         const dy = y - initialY - selectedBlock.y;
 
-        if (selectedBlock.color === 'red' || selectedBlock.color === 'red2' && dx === 0) {
+        if (selectedBlock.color === 'red'&& dx === 0  || selectedBlock.color === 'red2' && dx === 0 || selectedBlock.color === 'green' && dx === 0 || selectedBlock.color === 'key' && dx === 0) {
             moveBlock(selectedBlock, 0, dy);
-        } else if ((selectedBlock.color === 'green' || selectedBlock.color === 'key') && dy === 0) {
+        } else if ((selectedBlock.color === 'red' || selectedBlock.color === 'red2' || selectedBlock.color === 'green'|| selectedBlock.color === 'key') && dy === 0) {
             moveBlock(selectedBlock, dx, 0);
         }
     }
@@ -305,3 +203,7 @@ canvas.addEventListener('touchend', endDrag);
 
 
 loadSVGs(drawGame);
+
+document.getElementById("save").addEventListener("click", function() {
+    console.log(blocks);
+});
