@@ -3,79 +3,106 @@ const ctx = canvas.getContext('2d');
 const bufferCanvas = document.createElement('canvas');
 const bufferCtx = bufferCanvas.getContext('2d');
 
+function resizeCanvas() {
+
+    const size = Math.min(window.innerWidth, window.innerHeight / 1.5);
+    canvas.width = size - 15;
+    canvas.height = size - 15;
+}
+// Chiamata iniziale per impostare le dimensioni al caricamento della pagina
+resizeCanvas();
+
+// Aggiungi un listener per ridimensionare il canvas quando la finestra cambia dimensione
+window.addEventListener('resize', resizeCanvas);
+
 const gridSize = 6;
 const cellSize = canvas.width / gridSize;
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
+    const levelList = document.getElementById('levelList');
 
-
-    function fetchJsFiles() {
-        fetch('list_js_files.php')
-            .then(response => response.text()) // Utilizza text() invece di json() perché stiamo ottenendo HTML
-            .then(html => {
-                document.getElementById('navLevelList').innerHTML = html;
-                setInterval(updateCountdown, 1000);
-                updateCountdown();
-
-                const levelItems = document.querySelectorAll('#levelList li');
-
-                levelItems.forEach(item => {
-                    item.addEventListener('click', () => {
-                        const level = item.getAttribute('data-level');
-                        // Carica dinamicamente il file JavaScript
-                        const script = document.createElement('script');
-                        script.src = `${level}.js`;
-                        script.onload = () => {
-                            // Quando il file è caricato, ricarica il canvas
-                            drawGame();
-                        };
-                        document.head.appendChild(script);
-            
-                        // Rimuovi la classe 'active' da tutti gli elementi
-                        levelItems.forEach(i => {
-                            i.classList.remove('active');
-                        });
-                        // Aggiungi la classe 'active' all'elemento cliccato
-                        item.classList.add('active');
-                    });
-                });
-
-            })
-            .catch(error => console.error('Error fetching JS files:', error));
+    function getCurrentDate() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}${month}${day}`;
     }
-    
-    fetchJsFiles();
 
+    function addOneDay(dateString) {
+        const year = parseInt(dateString.substring(0, 4), 10);
+        const month = parseInt(dateString.substring(4, 6), 10) - 1;
+        const day = parseInt(dateString.substring(6, 8), 10);
+        const date = new Date(year, month, day);
+        date.setDate(date.getDate() +1);
+        return `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
+    }
+
+    function formatDate(dateString) {
+        return `${dateString.substring(0, 4)}-${dateString.substring(4, 6)}-${dateString.substring(6, 8)}`;
+    }
+
+    const startDate = 20240720;
+    let endDate = getCurrentDate();
+
+    const now = new Date();
+    const hours = now.getHours();
+    if (hours >= 22 ) {
+        endDate = addOneDay(endDate);
+    }
+
+    let listItems = '';
+
+    for (let date = startDate; date <= endDate; date++) {
+        const formattedDate = date.toString();
+        if (date == endDate)
+            listItems += `<li data-level="${formattedDate}" class="active">Level ${formatDate(formattedDate)}</li>`;
+        else
+            listItems += `<li data-level="${formattedDate}">Level ${formatDate(formattedDate)}</li>`;
+    }
+
+    levelList.innerHTML = `
+        ${listItems}
+        <br>
+        <div class="countdown" id="countdown"></div>
+    `;
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+    loadSVGs(drawGame);
+
+    const levelItems = document.querySelectorAll('#levelList li');
+    levelItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const level = item.getAttribute('data-level');
+            const script = document.createElement('script');
+            script.src = `${level}.js`;
+            script.onload = () => {
+                drawGame();
+            };
+            document.head.appendChild(script);
+
+            levelItems.forEach(i => {
+                i.classList.remove('active');
+            });
+            item.classList.add('active');
+        });
+    });
 
     function updateCountdown() {
         const now = new Date();
         const targetTime = new Date();
         targetTime.setHours(21, 59, 30, 0);
         if (now > targetTime) targetTime.setDate(targetTime.getDate() + 1);
-    
+
         const diff = targetTime - now;
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    
+
         document.getElementById('countdown').textContent = `${hours}h ${minutes}m left until the next mini game`;
     }
-
-
-   
-    
-
-    
-
-
 });
-
-
-
-
-
-
-
 
 const images = {};
 
@@ -109,8 +136,6 @@ let animationFrameId = null;
 
 bufferCanvas.width = canvas.width;
 bufferCanvas.height = canvas.height;
-
-
 
 function drawBlock(ctx, x, y, width, height, color) {
     const img = images[color];
@@ -177,7 +202,7 @@ function animateMove(block, startX, startY, endX, endY, startTime) {
     function step(timestamp) {
         if (!startTime) startTime = timestamp;
         const elapsed = timestamp - startTime;
-        const progress = Math.min(elapsed, 1); // Modifica la durata qui
+        const progress = Math.min(elapsed, 1);
         const easedProgress = easeInOutCubic(progress);
 
         const dx = (endX - startX) * easedProgress;
@@ -207,7 +232,7 @@ function animateMove(block, startX, startY, endX, endY, startTime) {
                     canvas.removeEventListener('touchend', endDrag);
                     if (win == false) {
                         alert('Hai vinto');
-                        win = true
+                        win = true;
                     }
                 }
             }
@@ -260,7 +285,7 @@ function drag(event) {
         const dx = x - initialX - selectedBlock.x;
         const dy = y - initialY - selectedBlock.y;
 
-        if (selectedBlock.color === 'red' || selectedBlock.color === 'red2' && dx === 0) {
+        if (selectedBlock.color === 'red' || (selectedBlock.color === 'red2' && dx === 0)) {
             moveBlock(selectedBlock, 0, dy);
         } else if ((selectedBlock.color === 'green' || selectedBlock.color === 'key') && dy === 0) {
             moveBlock(selectedBlock, dx, 0);
@@ -279,5 +304,21 @@ canvas.addEventListener('touchstart', startDrag);
 canvas.addEventListener('touchmove', drag);
 canvas.addEventListener('touchend', endDrag);
 
+function preventDefault(event) {
+    event.preventDefault();
+}
 
-loadSVGs(drawGame);
+function addEventListenerCompat(element, event, handler, options) {
+    if (element.addEventListener) {
+        element.addEventListener(event, handler, options);
+    } else if (element.attachEvent) {
+        element.attachEvent('on' + event, handler);
+    }
+}
+
+// Prevenire lo scrolling della pagina su touchmove
+addEventListenerCompat(canvas, 'touchmove', preventDefault, { passive: false });
+
+// Prevenire lo scrolling della pagina su wheel
+addEventListenerCompat(canvas, 'wheel', preventDefault, { passive: false });
+

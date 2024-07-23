@@ -3,14 +3,29 @@ const ctx = canvas.getContext('2d');
 const bufferCanvas = document.createElement('canvas');
 const bufferCtx = bufferCanvas.getContext('2d');
 
+function resizeCanvas() {
+
+    const size = Math.min(window.innerWidth, window.innerHeight / 1.5);
+    canvas.width = size - 15;
+    canvas.height = size - 15;
+}
+// Chiamata iniziale per impostare le dimensioni al caricamento della pagina
+resizeCanvas();
+
+// Aggiungi un listener per ridimensionare il canvas quando la finestra cambia dimensione
+window.addEventListener('resize', resizeCanvas);
+
 const gridSize = 6;
 const cellSize = canvas.width / gridSize;
 
 
+document.addEventListener('DOMContentLoaded', function() {
+
+    
+    loadSVGs(drawGame);
 
 
-
-
+});
 
 const images = {};
 
@@ -44,8 +59,6 @@ let animationFrameId = null;
 
 bufferCanvas.width = canvas.width;
 bufferCanvas.height = canvas.height;
-
-
 
 function drawBlock(ctx, x, y, width, height, color) {
     const img = images[color];
@@ -106,13 +119,11 @@ function easeInOutCubic(t) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
-let win = false;
-
 function animateMove(block, startX, startY, endX, endY, startTime) {
     function step(timestamp) {
         if (!startTime) startTime = timestamp;
         const elapsed = timestamp - startTime;
-        const progress = Math.min(elapsed, 1); // Modifica la durata qui
+        const progress = Math.min(elapsed, 1);
         const easedProgress = easeInOutCubic(progress);
 
         const dx = (endX - startX) * easedProgress;
@@ -131,8 +142,6 @@ function animateMove(block, startX, startY, endX, endY, startTime) {
             drawGame();
             cancelAnimationFrame(animationFrameId);
             animationFrameId = null;
-
-            
         }
     }
 
@@ -143,8 +152,7 @@ function moveBlock(block, dx, dy) {
     const newX = block.x + dx;
     const newY = block.y + dy;
     
-        animateMove(block, block.x, block.y, newX, newY, performance.now());
-    
+    animateMove(block, block.x, block.y, newX, newY, performance.now());
 }
 
 function startDrag(event) {
@@ -163,8 +171,20 @@ function startDrag(event) {
     if (selectedBlock) {
         initialX = x - selectedBlock.x;
         initialY = y - selectedBlock.y;
+        selectedBlock.clickCount = (selectedBlock.clickCount || 0) + 1;
+        if (selectedBlock.clickCount === 3) {
+            if (confirm("Sei sicuro di voler cancellare questo blocco?")) {
+                blocks = blocks.filter(block => block !== selectedBlock);
+                selectedBlock = null;
+                drawGame();
+            } else {
+                selectedBlock.clickCount = 0; // Reset del contatore se la cancellazione è annullata
+            }
+            return;
+        }
     }
 }
+
 
 function drag(event) {
     if (selectedBlock) {
@@ -182,7 +202,7 @@ function drag(event) {
         const dx = x - initialX - selectedBlock.x;
         const dy = y - initialY - selectedBlock.y;
 
-        if (selectedBlock.color === 'red'&& dx === 0  || selectedBlock.color === 'red2' && dx === 0 || selectedBlock.color === 'green' && dx === 0 || selectedBlock.color === 'key' && dx === 0) {
+        if (selectedBlock.color === 'red' && dx === 0  || selectedBlock.color === 'red2' && dx === 0 || selectedBlock.color === 'green' && dx === 0 || selectedBlock.color === 'key' && dx === 0) {
             moveBlock(selectedBlock, 0, dy);
         } else if ((selectedBlock.color === 'red' || selectedBlock.color === 'red2' || selectedBlock.color === 'green'|| selectedBlock.color === 'key') && dy === 0) {
             moveBlock(selectedBlock, dx, 0);
@@ -202,8 +222,12 @@ canvas.addEventListener('touchmove', drag);
 canvas.addEventListener('touchend', endDrag);
 
 
-loadSVGs(drawGame);
-
 document.getElementById("save").addEventListener("click", function() {
-    console.log(blocks);
+    
+        // Copia negli appunti
+        navigator.clipboard.writeText('blocks = ' + JSON.stringify(blocks, null, 0)).then(function() {
+            
+        }, function(err) {
+            console.error('Errore durante la copia negli appunti: ', err);
+        });
 });

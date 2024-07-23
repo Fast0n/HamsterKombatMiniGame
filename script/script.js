@@ -3,25 +3,42 @@ const ctx = canvas.getContext('2d');
 const bufferCanvas = document.createElement('canvas');
 const bufferCtx = bufferCanvas.getContext('2d');
 
+
+function resizeCanvas() {
+
+    const size = Math.min(window.innerWidth, window.innerHeight / 1.5);
+    canvas.width = size - 15;
+    canvas.height = size - 15;
+}
+// Chiamata iniziale per impostare le dimensioni al caricamento della pagina
+resizeCanvas();
+
+// Aggiungi un listener per ridimensionare il canvas quando la finestra cambia dimensione
+window.addEventListener('resize', resizeCanvas);
+
 const gridSize = 6;
 const cellSize = canvas.width / gridSize;
 
-document.addEventListener('DOMContentLoaded', function () {
+
+
+document.addEventListener('DOMContentLoaded', function() {
+
+
+
 
     function updateCountdown() {
         const now = new Date();
         const targetTime = new Date();
         targetTime.setHours(21, 59, 30, 0);
         if (now > targetTime) targetTime.setDate(targetTime.getDate() + 1);
-    
+
         const diff = targetTime - now;
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    
+
         document.getElementById('countdown').textContent = `${hours}h ${minutes}m left until the next mini game`;
     }
-
 
     function formatDate(date) {
         const year = date.getFullYear();
@@ -31,13 +48,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function setLevel() {
-        // Ottenere le date di due giorni fa, ieri e oggi
         const today = new Date();
         const tomorrow = new Date(today);
         const twoDaysAgo = new Date(today);
 
-
-        if (new Date().getHours() >= 22 || new Date().getHours() < 1) {
+        if (new Date().getHours() >= 22) {
             today.setDate(today.getDate() + 1);
             tomorrow.setDate(today.getDate() + 1);
             twoDaysAgo.setDate(today.getDate() - 1);
@@ -46,7 +61,6 @@ document.addEventListener('DOMContentLoaded', function () {
             twoDaysAgo.setDate(today.getDate() - 1);
         }
 
-        // Formattare le date
         const formattedToday_ = formatDate(today);
         const formattedTomorrow_ = formatDate(tomorrow);
         const formattedTwoDaysAgo_ = formatDate(twoDaysAgo);
@@ -55,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const formattedTomorrow = formatDate(tomorrow).replace(/-/g, '');
         const formattedTwoDaysAgo = formatDate(twoDaysAgo).replace(/-/g, '');
 
-        // Creare gli elementi della lista
         const levelList = document.getElementById('levelList');
         levelList.innerHTML = `
             <li data-level="${formattedTwoDaysAgo}">Level ${formattedTwoDaysAgo_}</li>
@@ -70,36 +83,27 @@ document.addEventListener('DOMContentLoaded', function () {
     setInterval(updateCountdown, 1000);
     updateCountdown();
     setLevel();
-
+    loadSVGs(drawGame);
     const levelItems = document.querySelectorAll('#levelList li');
 
     levelItems.forEach(item => {
         item.addEventListener('click', () => {
             const level = item.getAttribute('data-level');
-            // Carica dinamicamente il file JavaScript
             const script = document.createElement('script');
             script.src = `level/${level}.js`;
             script.onload = () => {
-                // Quando il file è caricato, ricarica il canvas
                 drawGame();
             };
             document.head.appendChild(script);
 
-            // Rimuovi la classe 'active' da tutti gli elementi
             levelItems.forEach(i => {
                 i.classList.remove('active');
             });
-            // Aggiungi la classe 'active' all'elemento cliccato
             item.classList.add('active');
         });
     });
 
 });
-
-
-
-
-
 
 const images = {};
 
@@ -123,6 +127,7 @@ function loadSVGs(callback) {
     }
 }
 
+
 let blocks = []
 
 let selectedBlock = null;
@@ -133,8 +138,6 @@ let animationFrameId = null;
 
 bufferCanvas.width = canvas.width;
 bufferCanvas.height = canvas.height;
-
-
 
 function drawBlock(ctx, x, y, width, height, color) {
     const img = images[color];
@@ -183,13 +186,15 @@ function canMoveBlock(block, dx, dy) {
             if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) {
                 return false;
             }
-            if (getBlockAt(x, y) && getBlockAt(x, y) !== block) {
+            const otherBlock = getBlockAt(x, y);
+            if (otherBlock && otherBlock !== block) {
                 return false;
             }
         }
     }
     return true;
 }
+
 
 function easeInOutCubic(t) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -201,7 +206,7 @@ function animateMove(block, startX, startY, endX, endY, startTime) {
     function step(timestamp) {
         if (!startTime) startTime = timestamp;
         const elapsed = timestamp - startTime;
-        const progress = Math.min(elapsed, 1); // Modifica la durata qui
+        const progress = Math.min(elapsed, 1);
         const easedProgress = easeInOutCubic(progress);
 
         const dx = (endX - startX) * easedProgress;
@@ -231,7 +236,7 @@ function animateMove(block, startX, startY, endX, endY, startTime) {
                     canvas.removeEventListener('touchend', endDrag);
                     if (win == false) {
                         alert('Hai vinto');
-                        win = true
+                        win = true;
                     }
                 }
             }
@@ -268,6 +273,7 @@ function startDrag(event) {
     }
 }
 
+
 function drag(event) {
     if (selectedBlock) {
         const rect = canvas.getBoundingClientRect();
@@ -284,13 +290,23 @@ function drag(event) {
         const dx = x - initialX - selectedBlock.x;
         const dy = y - initialY - selectedBlock.y;
 
-        if (selectedBlock.color === 'red' || selectedBlock.color === 'red2' && dx === 0) {
-            moveBlock(selectedBlock, 0, dy);
-        } else if ((selectedBlock.color === 'green' || selectedBlock.color === 'key') && dy === 0) {
-            moveBlock(selectedBlock, dx, 0);
+        // Assicurarsi che i blocchi si muovano solo nella direzione consentita
+        if (dx !== 0 && dy !== 0) {
+            return; // Non consentire movimento diagonale
+        }
+
+        if (selectedBlock.color === 'red' || selectedBlock.color === 'red2') {
+            if (dx === 0) {
+                moveBlock(selectedBlock, 0, dy);
+            }
+        } else if (selectedBlock.color === 'green' || selectedBlock.color === 'key') {
+            if (dy === 0) {
+                moveBlock(selectedBlock, dx, 0);
+            }
         }
     }
 }
+
 
 function endDrag() {
     selectedBlock = null;
@@ -303,5 +319,24 @@ canvas.addEventListener('touchstart', startDrag);
 canvas.addEventListener('touchmove', drag);
 canvas.addEventListener('touchend', endDrag);
 
+function preventDefault(event) {
+    event.preventDefault();
+}
 
-loadSVGs(drawGame);
+function addEventListenerCompat(element, event, handler, options) {
+    if (element.addEventListener) {
+        element.addEventListener(event, handler, options);
+    } else if (element.attachEvent) {
+        element.attachEvent('on' + event, handler);
+    }
+}
+
+// Prevenire lo scrolling della pagina su touchmove
+addEventListenerCompat(canvas, 'touchmove', preventDefault, {
+    passive: false
+});
+
+// Prevenire lo scrolling della pagina su wheel
+addEventListenerCompat(canvas, 'wheel', preventDefault, {
+    passive: false
+});
