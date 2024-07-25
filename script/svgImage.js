@@ -25,7 +25,7 @@ const svgFiles = {
     `,
     green: `
 <svg version="1.1" viewBox="0 0 2100 1228" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-    <rect x="0" y="0" width="2048" height="100%" fill="#234722" rx="20" ry="20"/>
+
 
         <rect x="0" y="0" width="100%" height="100%" fill="#234722" stroke="none" stroke-width="0" rx="100" ry="100"/>
         <rect x="0" y="0" width="100%" height="100%" fill="none" stroke="#3d6535" stroke-width="125" rx="100" ry="100"/>
@@ -36,6 +36,19 @@ const svgFiles = {
 </svg>
 
     `,
+
+    green2: `
+<svg version="1.1" viewBox="0 0 2048 768" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+
+        <rect x="0" y="0" width="100%" height="100%" fill="#234722" stroke="none" stroke-width="0" rx="100" ry="100"/>
+        <rect x="0" y="0" width="100%" height="100%" fill="none" stroke="#3d6535" stroke-width="125" rx="100" ry="100"/>
+        <rect x="0" y="0" width="100%" height="100%" fill="none" stroke="#242424" stroke-width="70" rx="100" ry="100"/>
+
+<path transform="translate(223,189)" d="m0 0h1595l19 1 5 4 1 4v140h131l6 5 1 2v83l-5 6-5 1h-128v141l-5 6-2 1h-1620l-11-12-1-16v-120h-134l-5-2-3-4-1-7v-75l4-7 3-2h136v-129l2-9 10-10z" fill="#65E427"/>
+</svg>
+
+    
+        `,
     key: `
     <svg version="1.1" viewBox="0 0 2100 1228" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
     

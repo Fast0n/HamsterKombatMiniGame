@@ -299,7 +299,7 @@ function drag(event) {
             if (dx === 0) {
                 moveBlock(selectedBlock, 0, dy);
             }
-        } else if (selectedBlock.color === 'green' || selectedBlock.color === 'key') {
+        } else if (selectedBlock.color === 'green' || selectedBlock.color === 'green2' || selectedBlock.color === 'key') {
             if (dy === 0) {
                 moveBlock(selectedBlock, dx, 0);
             }

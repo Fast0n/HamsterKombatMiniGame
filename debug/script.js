@@ -202,9 +202,9 @@ function drag(event) {
         const dx = x - initialX - selectedBlock.x;
         const dy = y - initialY - selectedBlock.y;
 
-        if (selectedBlock.color === 'red' && dx === 0  || selectedBlock.color === 'red2' && dx === 0 || selectedBlock.color === 'green' && dx === 0 || selectedBlock.color === 'key' && dx === 0) {
+        if (selectedBlock.color === 'red' && dx === 0  || selectedBlock.color === 'red2' && dx === 0 || selectedBlock.color === 'green' && dx === 0 || selectedBlock.color === 'green2' && dx === 0 || selectedBlock.color === 'key' && dx === 0) {
             moveBlock(selectedBlock, 0, dy);
-        } else if ((selectedBlock.color === 'red' || selectedBlock.color === 'red2' || selectedBlock.color === 'green'|| selectedBlock.color === 'key') && dy === 0) {
+        } else if ((selectedBlock.color === 'red' || selectedBlock.color === 'red2' || selectedBlock.color === 'green'||selectedBlock.color === 'green2'|| selectedBlock.color === 'key') && dy === 0) {
             moveBlock(selectedBlock, dx, 0);
         }
     }
