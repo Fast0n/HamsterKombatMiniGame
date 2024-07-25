@@ -6,6 +6,55 @@ const bufferCtx = bufferCanvas.getContext('2d');
 const gridSize = 6;
 const cellSize = canvas.width / gridSize;
 
+document.addEventListener('DOMContentLoaded', function () {
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = ('0' + (date.getMonth() + 1)).slice(-2);
+        const day = ('0' + date.getDate()).slice(-2);
+        return `${year}-${month}-${day}`;
+    }
+
+    function setLevel() {
+        // Ottenere le date di due giorni fa, ieri e oggi
+        const today = new Date();
+        const tomorrow = new Date(today);
+        const twoDaysAgo = new Date(today);
+
+
+        if (new Date().getHours() >= 22 || new Date().getHours() < 1) {
+            today.setDate(today.getDate() + 1);
+            tomorrow.setDate(today.getDate() + 1);
+            twoDaysAgo.setDate(today.getDate() - 1);
+        } else {
+            tomorrow.setDate(today.getDate() + 1);
+            twoDaysAgo.setDate(today.getDate() - 1);
+        }
+
+        // Formattare le date
+        const formattedToday_ = formatDate(today);
+        const formattedTomorrow_ = formatDate(tomorrow);
+        const formattedTwoDaysAgo_ = formatDate(twoDaysAgo);
+
+        const formattedToday = formatDate(today).replace(/-/g, '');
+        const formattedTomorrow = formatDate(tomorrow).replace(/-/g, '');
+        const formattedTwoDaysAgo = formatDate(twoDaysAgo).replace(/-/g, '');
+
+        // Creare gli elementi della lista
+        const levelList = document.getElementById('levelList');
+        levelList.innerHTML = `
+            <li data-level="${formattedTwoDaysAgo}">Level ${formattedTwoDaysAgo_}</li>
+            <li data-level="${formattedToday}" class="active" >Level ${formattedToday_}</li>
+            <li data-level="${formattedTomorrow}"class="disabled" >Level ${formattedTomorrow_}</li>
+
+            <br>
+            <div class="countdown" id="countdown"></div>
+        `;
+    }
+
+    setLevel();
+});
+
+
 
 document.addEventListener('DOMContentLoaded', (event) => {
     const levelItems = document.querySelectorAll('#levelList li');
@@ -13,15 +62,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
     levelItems.forEach(item => {
         item.addEventListener('click', () => {
             const level = item.getAttribute('data-level');
-                // Carica dinamicamente il file JavaScript
-                const script = document.createElement('script');
-                script.src = `level/${level}.js`;
-                script.onload = () => {
-                    // Quando il file è caricato, ricarica il canvas
-                    drawGame();
-                };
-                document.head.appendChild(script);
-            
+            // Carica dinamicamente il file JavaScript
+            const script = document.createElement('script');
+            script.src = `level/${level}.js`;
+            script.onload = () => {
+                // Quando il file è caricato, ricarica il canvas
+                drawGame();
+            };
+            document.head.appendChild(script);
+
         });
     });
 });
@@ -43,46 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// Funzione per ottenere la data in formato YYYY-MM-DD
-function formatDateSlash(date) {
-    const year = date.getFullYear();
-    const month = ('0' + (date.getMonth() + 1)).slice(-2);
-    const day = ('0' + date.getDate()).slice(-2);
-    return `${year}-${month}-${day}`;
-}
 
-function formatDate(date) {
-    const year = date.getFullYear();
-    const month = ('0' + (date.getMonth() + 1)).slice(-2);
-    const day = ('0' + date.getDate()).slice(-2);
-    return `${year}${month}${day}`;
-}
-
-// Ottenere le date di due giorni fa, ieri e oggi
-const today = new Date();
-const tomorrow = new Date(today);
-tomorrow.setDate(today.getDate() + 1);
-const twoDaysAgo = new Date(today);
-twoDaysAgo.setDate(today.getDate() - 1);
-
-// Formattare le date
-const formattedToday_ = formatDateSlash(today);
-const formattedTomorrow_ = formatDateSlash(tomorrow);
-const formattedTwoDaysAgo_ = formatDateSlash(twoDaysAgo);
-
-const formattedToday = formatDate(today);
-const formattedTomorrow = formatDate(tomorrow);
-const formattedTwoDaysAgo = formatDate(twoDaysAgo);
-
-// Creare gli elementi della lista
-const levelList = document.getElementById('levelList');
-levelList.innerHTML = `
-    <li data-level="${formattedTwoDaysAgo}">Level ${formattedTwoDaysAgo_}</li>
-    <li data-level="${formattedToday}">Level ${formattedToday_}</li>
-    <li data-level="${formattedTomorrow}" class="active">Level ${formattedTomorrow_}</li>
-    <br>
-    <div class="countdown" id="countdown"></div>
-`;
 
 
 const images = {};
@@ -195,11 +205,12 @@ function easeInOutCubic(t) {
 }
 
 let win = false;
+
 function animateMove(block, startX, startY, endX, endY, startTime) {
     function step(timestamp) {
         if (!startTime) startTime = timestamp;
         const elapsed = timestamp - startTime;
-        const progress = Math.min(elapsed , 1); // Modifica la durata qui
+        const progress = Math.min(elapsed, 1); // Modifica la durata qui
         const easedProgress = easeInOutCubic(progress);
 
         const dx = (endX - startX) * easedProgress;
@@ -220,7 +231,6 @@ function animateMove(block, startX, startY, endX, endY, startTime) {
             animationFrameId = null;
 
             if (block.color === 'key') {
-                console.log(`Key block coordinates: x=${block.x}, y=${block.y}`);
                 if (block.x === 4 && block.y === 2) {
                     canvas.removeEventListener('mousedown', startDrag);
                     canvas.removeEventListener('mousemove', drag);
@@ -228,7 +238,7 @@ function animateMove(block, startX, startY, endX, endY, startTime) {
                     canvas.removeEventListener('touchstart', startDrag);
                     canvas.removeEventListener('touchmove', drag);
                     canvas.removeEventListener('touchend', endDrag);
-                    if (win == false){
+                    if (win == false) {
                         alert('Hai vinto');
                         win = true
                     }
@@ -302,6 +312,5 @@ canvas.addEventListener('touchstart', startDrag);
 canvas.addEventListener('touchmove', drag);
 canvas.addEventListener('touchend', endDrag);
 
+
 loadSVGs(drawGame);
-
-
