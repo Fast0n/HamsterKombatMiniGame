@@ -129,58 +129,69 @@ function moveBlock(block, dx, dy) {
     const newY = block.y + dy;
 
     if (canMoveBlock(block, dx, dy)) {
-        animateMove(block, block.x, block.y, newX, newY, performance.now());
+        animateMove(block, newX, newY);
     }
 }
-// Funzione per animare il movimento di un blocco
-function animateMove(block, startX, startY, endX, endY, startTime) {
-    function step(timestamp) {
-        if (!startTime) startTime = timestamp;
-        const elapsed = timestamp - startTime;
-        const animationDuration = 10; // Durata dell'animazione in millisecondi
-        const progress = Math.min(elapsed / animationDuration, 1);
-        const easedProgress = easeInOutCubic(progress);
 
-        const dx = (endX - startX) * easedProgress;
-        const dy = (endY - startY) * easedProgress;
 
-        block.x = startX + dx;
-        block.y = startY + dy;
+// Funzione per animare il blocco che esce dalla griglia
+function animateKeyExit(block) {
+    const exitDuration = 2000; // Durata dell'animazione in millisecondi
+    const startTime = performance.now();
+    const startX = block.x;
+    const endX = gridSize; // Sposta il blocco fuori dalla griglia a destra
 
-        drawGame();
+    function animate(time) {
+        const elapsed = time - startTime;
+        const progress = Math.min(elapsed / exitDuration, 1); // Calcola il progresso dell'animazione
+        // Calcola la posizione intermedia del blocco
+        const x = startX + (endX - startX) * easeInOutCubic(progress);
+        block.x = x;
+
+        drawGame(); // Ridisegna il gioco con la nuova posizione del blocco
 
         if (progress < 1) {
-            animationFrameId = requestAnimationFrame(step);
+            animationFrameId = requestAnimationFrame(animate);
         } else {
-            block.x = endX;
-            block.y = endY;
-            drawGame();
-            cancelAnimationFrame(animationFrameId);
-            animationFrameId = null;
 
-            // Controlla se il blocco key è nella posizione vincente
-            if (block.color === 'key' && block.x === 4 && block.y === 2) {
                 canvas.removeEventListener('mousedown', startDrag);
                 canvas.removeEventListener('mousemove', drag);
                 canvas.removeEventListener('mouseup', endDrag);
                 canvas.removeEventListener('touchstart', startDrag);
                 canvas.removeEventListener('touchmove', drag);
                 canvas.removeEventListener('touchend', endDrag);
+
                 if (!win) {
                     alert('You Won');
                     win = true;
-
-                    // Ricarica la pagina dopo 1 secondo
                     setTimeout(() => {
                         location.reload();
-                    }, 1000);
-
+                    }, 2000);
                 }
-            }
+
         }
     }
 
-    requestAnimationFrame(step);
+    animationFrameId = requestAnimationFrame(animate);
+}
+
+// Funzione per animare il movimento di un blocco
+function animateMove(block, endX, endY) {
+    // Imposta immediatamente le coordinate finali del blocco
+    block.x = endX;
+    block.y = endY;
+
+    // Ridisegna la canvas per riflettere il nuovo stato del blocco
+    drawGame();
+
+    // Controlla se il blocco key è nella posizione vincente
+    if (block.color === 'key' && block.x === 4 && block.y === 2) {
+            animateKeyExit(block);
+    }
+}
+
+function easeInOutCubic(t) {
+    return t < 1 ? 1 * t * t * t : 1 - Math.pow(-1 * t + 1, 4) / 2;
 }
 
 function drawBlock(ctx, x, y, width, height, color) {
@@ -405,10 +416,6 @@ function loadSVGs(callback) {
             }
         };
     }
-}
-
-function easeInOutCubic(t) {
-    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
 // Funzioni di aggiornamento e configurazione
