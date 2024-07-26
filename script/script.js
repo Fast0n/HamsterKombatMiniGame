@@ -16,8 +16,8 @@ let win = false;
 
 // Variabili da aggiungere
 const borderRadius = 4;
-const padding = 3;
-const borderWidth = 3; // Larghezza del bordo
+const padding = 2;
+const borderWidth = 2; // Larghezza del bordo
 
 // Funzioni principali
 function resizeCanvas() {
@@ -31,99 +31,99 @@ function resizeCanvas() {
 }
 
 function drawGame() {
-// Pulire il canvas di buffer
-bufferCtx.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
-bufferCtx.fillStyle = '#242424';
-bufferCtx.fillRect(0, 0, bufferCanvas.width, bufferCanvas.height);
+    // Pulire il canvas di buffer
+    bufferCtx.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
+    bufferCtx.fillStyle = '#242424';
+    bufferCtx.fillRect(0, 0, bufferCanvas.width, bufferCanvas.height);
 
-const starSize = 5; // Dimensione della stella (controlla le dimensioni complessive)
+    const starSize = 5; // Dimensione della stella (controlla le dimensioni complessive)
 
-function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius) {
-    const step = Math.PI / spikes;
-    const path = new Path2D();
-    for (let i = 0; i < 2 * spikes; i++) {
-        const radius = i % 2 === 0 ? outerRadius : innerRadius;
-        const angle = i * step;
-        const x = cx + Math.cos(angle) * radius;
-        const y = cy + Math.sin(angle) * radius;
-        if (i === 0) {
-            path.moveTo(x, y);
-        } else {
-            path.lineTo(x, y);
+    function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius) {
+        const step = Math.PI / spikes;
+        const path = new Path2D();
+        for (let i = 0; i < 2 * spikes; i++) {
+            const radius = i % 2 === 0 ? outerRadius : innerRadius;
+            const angle = i * step;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+            if (i === 0) {
+                path.moveTo(x, y);
+            } else {
+                path.lineTo(x, y);
+            }
         }
+        path.closePath();
+        ctx.fill(path);
+        ctx.stroke(path);
     }
-    path.closePath();
-    ctx.fill(path);
-    ctx.stroke(path);
-}
 
-const starOuterRadius = starSize; // Raggio esterno della stella
-const starInnerRadius = starSize / 2; // Raggio interno della stella (metà della dimensione)
+    const starOuterRadius = starSize; // Raggio esterno della stella
+    const starInnerRadius = starSize / 2; // Raggio interno della stella (metà della dimensione)
 
-function drawStarsOnGrid() {
-    const starFillColor = '#242424'; // Colore delle stelle
-    const starStrokeColor = '#424242'; // Colore del bordo delle stelle
-    const starStrokeWidth = 1; // Larghezza del bordo
+    function drawStarsOnGrid() {
+        const starFillColor = '#242424'; // Colore delle stelle
+        const starStrokeColor = '#424242'; // Colore del bordo delle stelle
+        const starStrokeWidth = 1; // Larghezza del bordo
 
-    bufferCtx.fillStyle = starFillColor; // Colore di riempimento della stella
-    bufferCtx.strokeStyle = starStrokeColor; // Colore del bordo
-    bufferCtx.lineWidth = starStrokeWidth; // Larghezza del bordo
+        bufferCtx.fillStyle = starFillColor; // Colore di riempimento della stella
+        bufferCtx.strokeStyle = starStrokeColor; // Colore del bordo
+        bufferCtx.lineWidth = starStrokeWidth; // Larghezza del bordo
 
-    for (let i = 0; i <= gridSize; i++) {
-        for (let j = 0; j <= gridSize; j++) {
-            // Calcola le coordinate della stella
-            let x = i * cellSize;
-            let y = j * cellSize;
+        for (let i = 0; i <= gridSize; i++) {
+            for (let j = 0; j <= gridSize; j++) {
+                // Calcola le coordinate della stella
+                let x = i * cellSize;
+                let y = j * cellSize;
 
-            // Evita di disegnare le stelle sui bordi laterali
-            if (x > 0 && x < canvas.width && y > 0 && y < canvas.height) {
-                drawStar(bufferCtx, x, y, 4, starOuterRadius, starInnerRadius);
+                // Evita di disegnare le stelle sui bordi laterali
+                if (x > 0 && x < canvas.width && y > 0 && y < canvas.height) {
+                    drawStar(bufferCtx, x, y, 4, starOuterRadius, starInnerRadius);
+                }
             }
         }
     }
-}
 
-// Disegna la griglia
-function drawGrid() {
-    bufferCtx.strokeStyle = '#424242';
-    bufferCtx.lineWidth = 1;
-    bufferCtx.lineJoin = 'round';
-    bufferCtx.lineCap = 'round';
+    // Disegna la griglia
+    function drawGrid() {
+        bufferCtx.strokeStyle = '#424242';
+        bufferCtx.lineWidth = 1;
+        bufferCtx.lineJoin = 'round';
+        bufferCtx.lineCap = 'round';
 
-    // Disegna le linee verticali
-    for (let i = 0; i <= gridSize; i++) {
-        bufferCtx.beginPath();
-        bufferCtx.moveTo(i * cellSize, 0);
-        bufferCtx.lineTo(i * cellSize, canvas.height);
-        bufferCtx.stroke();
+        // Disegna le linee verticali
+        for (let i = 0; i <= gridSize; i++) {
+            bufferCtx.beginPath();
+            bufferCtx.moveTo(i * cellSize, 0);
+            bufferCtx.lineTo(i * cellSize, canvas.height);
+            bufferCtx.stroke();
+        }
+
+        // Disegna le linee orizzontali
+        for (let i = 0; i <= gridSize; i++) {
+            bufferCtx.beginPath();
+            bufferCtx.moveTo(0, i * cellSize);
+            bufferCtx.lineTo(canvas.width, i * cellSize);
+            bufferCtx.stroke();
+        }
     }
 
-    // Disegna le linee orizzontali
-    for (let i = 0; i <= gridSize; i++) {
-        bufferCtx.beginPath();
-        bufferCtx.moveTo(0, i * cellSize);
-        bufferCtx.lineTo(canvas.width, i * cellSize);
-        bufferCtx.stroke();
-    }
-}
+    // Disegna la griglia e le stelle
+    drawGrid();
+    drawStarsOnGrid();
 
-// Disegna la griglia e le stelle
-drawGrid();
-drawStarsOnGrid();
+    // Disegna gli oggetti sopra la griglia
+    blocks.forEach(block => {
+        drawBlock(bufferCtx, block.x, block.y, block.width, block.height, block.color);
+    });
 
-// Disegna gli oggetti sopra la griglia
-blocks.forEach(block => {
-    drawBlock(bufferCtx, block.x, block.y, block.width, block.height, block.color);
-});
-
-// Disegna il buffer sul canvas principale
-ctx.clearRect(0, 0, canvas.width, canvas.height);
-ctx.drawImage(bufferCanvas, 0, 0);
+    // Disegna il buffer sul canvas principale
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(bufferCanvas, 0, 0);
 
 }
 
 
-
+// Funzione per muovere un blocco
 function moveBlock(block, dx, dy) {
     const newX = block.x + dx;
     const newY = block.y + dy;
@@ -132,14 +132,13 @@ function moveBlock(block, dx, dy) {
         animateMove(block, block.x, block.y, newX, newY, performance.now());
     }
 }
-
+// Funzione per animare il movimento di un blocco
 function animateMove(block, startX, startY, endX, endY, startTime) {
     function step(timestamp) {
         if (!startTime) startTime = timestamp;
         const elapsed = timestamp - startTime;
-        // usare sempre il valore 10
-        const animation = 10;
-        const progress = Math.min(elapsed / animation, 1);
+        const animationDuration = 10; // Durata dell'animazione in millisecondi
+        const progress = Math.min(elapsed / animationDuration, 1);
         const easedProgress = easeInOutCubic(progress);
 
         const dx = (endX - startX) * easedProgress;
@@ -159,18 +158,23 @@ function animateMove(block, startX, startY, endX, endY, startTime) {
             cancelAnimationFrame(animationFrameId);
             animationFrameId = null;
 
-            if (block.color === 'key') {
-                if (block.x === 4 && block.y === 2) {
-                    canvas.removeEventListener('mousedown', startDrag);
-                    canvas.removeEventListener('mousemove', drag);
-                    canvas.removeEventListener('mouseup', endDrag);
-                    canvas.removeEventListener('touchstart', startDrag);
-                    canvas.removeEventListener('touchmove', drag);
-                    canvas.removeEventListener('touchend', endDrag);
-                    if (!win) {
-                        alert('You Won');
-                        win = true;
-                    }
+            // Controlla se il blocco key è nella posizione vincente
+            if (block.color === 'key' && block.x === 4 && block.y === 2) {
+                canvas.removeEventListener('mousedown', startDrag);
+                canvas.removeEventListener('mousemove', drag);
+                canvas.removeEventListener('mouseup', endDrag);
+                canvas.removeEventListener('touchstart', startDrag);
+                canvas.removeEventListener('touchmove', drag);
+                canvas.removeEventListener('touchend', endDrag);
+                if (!win) {
+                    alert('You Won');
+                    win = true;
+
+                    // Ricarica la pagina dopo 1 secondo
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+
                 }
             }
         }
@@ -185,7 +189,7 @@ function drawBlock(ctx, x, y, width, height, color) {
     const drawY = y * cellSize + padding;
     const drawWidth = width * cellSize - 2 * padding;
     const drawHeight = height * cellSize - 2 * padding;
-    
+
     // Determina il colore di sfondo in base al colore del blocco
     let backgroundColor;
     if (color === 'red' || color === 'red2') {
@@ -235,13 +239,11 @@ function drawBlock(ctx, x, y, width, height, color) {
 
     // Disegna il bordo
     ctx.save();
-    if (color === 'red' || color === 'red2'){
+    if (color === 'red' || color === 'red2') {
         ctx.strokeStyle = "#93282b";
-    }
-    else if (color === 'green' || color === 'green2') {
+    } else if (color === 'green' || color === 'green2') {
         ctx.strokeStyle = "#3d6535";
-    }
-    else if (color === 'key'){
+    } else if (color === 'key') {
         ctx.strokeStyle = "#819523";
     }
     ctx.lineWidth = borderWidth;
@@ -262,6 +264,7 @@ function drawBlock(ctx, x, y, width, height, color) {
 
 
 
+// Funzione per verificare se un blocco può muoversi
 function canMoveBlock(block, dx, dy) {
     const newX = block.x + dx;
     const newY = block.y + dy;
@@ -285,51 +288,36 @@ function canMoveBlock(block, dx, dy) {
         if (otherBlock === block) continue;
 
         const isColliding = !(newX + block.width <= otherBlock.x ||
-                              newX >= otherBlock.x + otherBlock.width ||
-                              newY + block.height <= otherBlock.y ||
-                              newY >= otherBlock.y + otherBlock.height);
+            newX >= otherBlock.x + otherBlock.width ||
+            newY + block.height <= otherBlock.y ||
+            newY >= otherBlock.y + otherBlock.height);
         if (isColliding) {
             return false;
         }
     }
 
-    // Controlla se i blocchi rossi possono essere superati verticalmente
-    if (block.color === 'red' || block.color === 'red2') {
-        for (const otherBlock of blocks) {
-            if (otherBlock === block) continue;
+    // Prevenire il sorpasso dei blocchi
+    for (const otherBlock of blocks) {
+        if (otherBlock === block) continue;
 
-            if (block.x === otherBlock.x) {
+        if (block.color === 'red' || block.color === 'red2') {
+            // Blocchi rossi possono solo muoversi verticalmente
+            if (dx === 0 && (newX === otherBlock.x || newX + block.width === otherBlock.x + otherBlock.width)) {
                 const isOverlappingVertically = (dy > 0 && newY + block.height > otherBlock.y && block.y < otherBlock.y) ||
-                                                (dy < 0 && newY < otherBlock.y + otherBlock.height && block.y > otherBlock.y);
+                    (dy < 0 && newY < otherBlock.y + otherBlock.height && block.y > otherBlock.y);
                 if (isOverlappingVertically) {
-                    // Verifica se la sovrapposizione è completa
-                    const blockTop = block.y;
-                    const blockBottom = block.y + block.height;
-                    const otherBlockTop = otherBlock.y;
-                    const otherBlockBottom = otherBlock.y + otherBlock.height;
-
-                    // Se il blocco rosso è parzialmente o completamente coperto, il movimento non è consentito
-                    if ((dy > 0 && (blockTop < otherBlockBottom && blockBottom > otherBlockTop)) ||
-                        (dy < 0 && (blockTop < otherBlockBottom && blockBottom > otherBlockTop))) {
-                        return false;
-                    }
+                    // Se il blocco rosso è parzialmente o completamente sopra un altro blocco, il movimento non è consentito
+                    return false;
                 }
             }
-        }
-    }
-
-    // Controlla se i blocchi verdi o chiave possono superare un blocco rosso nella stessa riga
-    if (block.color === 'green' || block.color === 'green2' || block.color === 'key') {
-        for (const otherBlock of blocks) {
-            if (otherBlock === block) continue;
-
-            if (block.y === otherBlock.y) {
+        } else if (block.color === 'green' || block.color === 'green2' || block.color === 'key') {
+            // Blocchi verdi e chiave possono solo muoversi orizzontalmente
+            if (dy === 0 && (newY === otherBlock.y || newY + block.height === otherBlock.y + otherBlock.height)) {
                 const isOverlappingHorizontally = (dx > 0 && newX + block.width > otherBlock.x && block.x < otherBlock.x) ||
-                                                  (dx < 0 && newX < otherBlock.x + otherBlock.width && block.x > otherBlock.x);
+                    (dx < 0 && newX < otherBlock.x + otherBlock.width && block.x > otherBlock.x);
                 if (isOverlappingHorizontally) {
-                    if (otherBlock.color === 'red' || otherBlock.color === 'red2') {
-                        return false;
-                    }
+                    // Se il blocco verde o chiave è parzialmente o completamente sopra un altro blocco, il movimento non è consentito
+                    return false;
                 }
             }
         }
@@ -337,7 +325,6 @@ function canMoveBlock(block, dx, dy) {
 
     return true;
 }
-
 
 
 
@@ -365,6 +352,7 @@ function startDrag(event) {
     }
 }
 
+// Funzione di drag e drop aggiornata
 function drag(event) {
     if (selectedBlock) {
         const rect = canvas.getBoundingClientRect();
@@ -392,7 +380,6 @@ function drag(event) {
         }
     }
 }
-
 
 
 function endDrag() {
@@ -452,13 +439,13 @@ function init() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         setInterval(updateCountdown, 1000);
         updateCountdown();
         loadSVGs(drawGame);
-    
+
         const levelList = document.getElementById('levelList');
-    
+
         function getCurrentDate() {
             const today = new Date();
             const year = today.getFullYear();
@@ -466,7 +453,7 @@ function init() {
             const day = String(today.getDate()).padStart(2, '0');
             return `${year}${month}${day}`;
         }
-    
+
         function addOneDay(dateString) {
             const year = parseInt(dateString.substring(0, 4), 10);
             const month = parseInt(dateString.substring(4, 6), 10) - 1;
@@ -475,28 +462,28 @@ function init() {
             date.setDate(date.getDate() + 1);
             return `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
         }
-    
+
         function formatDate(dateString) {
             return `${dateString.substring(0, 4)}-${dateString.substring(4, 6)}-${dateString.substring(6, 8)}`;
         }
-    
+
         const startDate = '20240720'; // Formato string per coerenza
         let endDate = getCurrentDate();
-    
+
         const now = new Date();
         if (now.getHours() >= 22) {
             endDate = addOneDay(endDate);
         }
-    
+
         let dateArray = [];
         for (let date = startDate; date <= endDate; date = addOneDay(date)) {
             dateArray.push(date);
         }
-    
+
         // Aggiungi un giorno extra e applica la classe 'disabled'
         const extraDate = addOneDay(endDate);
         dateArray.push(extraDate);
-    
+
         let listItems = '';
         dateArray.slice().reverse().forEach(date => {
             const formattedDate = date.toString();
@@ -508,15 +495,15 @@ function init() {
                 listItems += `<li data-level="${formattedDate}">Level ${formatDate(formattedDate)}</li>`;
             }
         });
-        
-    
+
+
         levelList.innerHTML = listItems;
-    
+
         const levelItems = document.querySelectorAll('#levelList li');
         levelItems.forEach(item => {
             item.addEventListener('click', () => {
                 if (item.classList.contains('disabled')) return;
-    
+
                 const level = item.getAttribute('data-level');
                 const script = document.createElement('script');
                 script.src = `level/${level}.js`;
@@ -524,7 +511,7 @@ function init() {
                     drawGame();
                 };
                 document.head.appendChild(script);
-    
+
                 levelItems.forEach(i => {
                     i.classList.remove('active');
                 });
@@ -532,7 +519,7 @@ function init() {
             });
         });
     });
-    
+
 
     canvas.addEventListener('mousedown', startDrag);
     canvas.addEventListener('mousemove', drag);
