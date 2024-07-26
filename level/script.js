@@ -55,14 +55,6 @@ function drawGame() {
     ctx.drawImage(bufferCanvas, 0, 0);
 }
 
-function moveBlock(block, dx, dy) {
-    const newX = block.x + dx;
-    const newY = block.y + dy;
-    if (canMoveBlock(block, dx, dy)) {
-        animateMove(block, block.x, block.y, newX, newY, performance.now());
-    }
-}
-
 function animateMove(block, startX, startY, endX, endY, startTime) {
     function step(timestamp) {
         if (!startTime) startTime = timestamp;
@@ -115,24 +107,123 @@ function drawBlock(ctx, x, y, width, height, color) {
 function canMoveBlock(block, dx, dy) {
     const newX = block.x + dx;
     const newY = block.y + dy;
-    for (let x = newX; x < newX + block.width; x++) {
-        for (let y = newY; y < newY + block.height; y++) {
-            if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) {
-                return false;
-            }
-            if (getBlockAt(x, y) && getBlockAt(x, y) !== block) {
-                return false;
+
+    // Verifica che il blocco non esca dai limiti della griglia
+    if (newX < 0 || newY < 0 || newX + block.width > gridSize || newY + block.height > gridSize) {
+        return false;
+    }
+
+    // Controlla la direzione di movimento consentita per il blocco
+    if ((block.color === 'red' || block.color === 'red2') && dx !== 0) {
+        return false; // Blocchi rossi possono muoversi solo verticalmente
+    }
+
+    if ((block.color === 'green' || block.color === 'green2' || block.color === 'key') && dy !== 0) {
+        return false; // Blocchi verdi e chiave possono muoversi solo orizzontalmente
+    }
+
+    // Controlla la collisione con altri blocchi
+    for (const otherBlock of blocks) {
+        if (otherBlock === block) continue;
+
+        const isColliding = !(newX + block.width <= otherBlock.x ||
+                              newX >= otherBlock.x + otherBlock.width ||
+                              newY + block.height <= otherBlock.y ||
+                              newY >= otherBlock.y + otherBlock.height);
+        if (isColliding) {
+            return false;
+        }
+    }
+
+    // Controlla se i blocchi rossi possono essere superati verticalmente
+    if (block.color === 'red' || block.color === 'red2') {
+        for (const otherBlock of blocks) {
+            if (otherBlock === block) continue;
+
+            if (block.x === otherBlock.x) {
+                const isOverlappingVertically = (dy > 0 && newY + block.height > otherBlock.y && block.y < otherBlock.y) ||
+                                                (dy < 0 && newY < otherBlock.y + otherBlock.height && block.y > otherBlock.y);
+                if (isOverlappingVertically) {
+                    // Verifica se la sovrapposizione è completa
+                    const blockTop = block.y;
+                    const blockBottom = block.y + block.height;
+                    const otherBlockTop = otherBlock.y;
+                    const otherBlockBottom = otherBlock.y + otherBlock.height;
+
+                    // Se il blocco rosso è parzialmente o completamente coperto, il movimento non è consentito
+                    if ((dy > 0 && (blockTop < otherBlockBottom && blockBottom > otherBlockTop)) ||
+                        (dy < 0 && (blockTop < otherBlockBottom && blockBottom > otherBlockTop))) {
+                        return false;
+                    }
+                }
             }
         }
     }
+
+    // Controlla se i blocchi verdi o chiave possono superare un blocco rosso nella stessa riga
+    if (block.color === 'green' || block.color === 'green2' || block.color === 'key') {
+        for (const otherBlock of blocks) {
+            if (otherBlock === block) continue;
+
+            if (block.y === otherBlock.y) {
+                const isOverlappingHorizontally = (dx > 0 && newX + block.width > otherBlock.x && block.x < otherBlock.x) ||
+                                                  (dx < 0 && newX < otherBlock.x + otherBlock.width && block.x > otherBlock.x);
+                if (isOverlappingHorizontally) {
+                    if (otherBlock.color === 'red' || otherBlock.color === 'red2') {
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+
     return true;
 }
 
 
+
+
+
+function moveBlock(block, dx, dy) {
+    const newX = block.x + dx;
+    const newY = block.y + dy;
+
+    if (canMoveBlock(block, dx, dy)) {
+        animateMove(block, block.x, block.y, newX, newY, performance.now());
+    }
+}
+
+function drag(event) {
+    if (selectedBlock) {
+        const rect = canvas.getBoundingClientRect();
+        let x, y;
+
+        if (event.touches) {
+            x = Math.floor((event.touches[0].clientX - rect.left) / cellSize);
+            y = Math.floor((event.touches[0].clientY - rect.top) / cellSize);
+        } else {
+            x = Math.floor((event.clientX - rect.left) / cellSize);
+            y = Math.floor((event.clientY - rect.top) / cellSize);
+        }
+
+        const dx = x - initialX - selectedBlock.x;
+        const dy = y - initialY - selectedBlock.y;
+
+        if (dx !== 0 && dy !== 0) {
+            return; // I blocchi non possono muoversi diagonalmente
+        }
+
+        if ((selectedBlock.color === 'red' || selectedBlock.color === 'red2') && dx === 0) {
+            moveBlock(selectedBlock, 0, dy); // I blocchi rossi possono muoversi solo verticalmente
+        } else if ((selectedBlock.color === 'green' || selectedBlock.color === 'green2' || selectedBlock.color === 'key') && dy === 0) {
+            moveBlock(selectedBlock, dx, 0); // I blocchi verdi e chiave possono muoversi solo orizzontalmente
+        }
+    }
+}
+
 function getBlockAt(x, y) {
     return blocks.find(block => x >= block.x && x < block.x + block.width && y >= block.y && y < block.y + block.height);
 }
-
 
 function startDrag(event) {
     const rect = canvas.getBoundingClientRect();
@@ -153,36 +244,15 @@ function startDrag(event) {
     }
 }
 
-function drag(event) {
-    if (selectedBlock) {
-        const rect = canvas.getBoundingClientRect();
-        let x, y;
-
-        if (event.touches) {
-            x = Math.floor((event.touches[0].clientX - rect.left) / cellSize);
-            y = Math.floor((event.touches[0].clientY - rect.top) / cellSize);
-        } else {
-            x = Math.floor((event.clientX - rect.left) / cellSize);
-            y = Math.floor((event.clientY - rect.top) / cellSize);
-        }
-
-        const dx = x - initialX - selectedBlock.x;
-        const dy = y - initialY - selectedBlock.y;
-
-        if (selectedBlock.color === 'red' || (selectedBlock.color === 'red2' && dx === 0)) {
-            moveBlock(selectedBlock, 0, dy);
-        } else if ((selectedBlock.color === 'green' || selectedBlock.color === 'key' || selectedBlock.color === 'green2') && dy === 0) {
-            moveBlock(selectedBlock, dx, 0);
-        }
-    }
+function endDrag() {
+    selectedBlock = null;
 }
+
+
+
 
 function easeInOutCubic(t) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-}
-
-function endDrag() {
-    selectedBlock = null;
 }
 
 function loadSVGs(callback) {

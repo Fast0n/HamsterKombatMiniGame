@@ -120,29 +120,80 @@ function canMoveBlock(block, dx, dy) {
     const newX = block.x + dx;
     const newY = block.y + dy;
 
+    // Verifica che il blocco non esca dai limiti della griglia
     if (newX < 0 || newY < 0 || newX + block.width > gridSize || newY + block.height > gridSize) {
         return false;
     }
 
+    // Controlla la direzione di movimento consentita per il blocco
+    if ((block.color === 'red' || block.color === 'red2') && dx !== 0) {
+        return false; // Blocchi rossi possono muoversi solo verticalmente
+    }
+
+    if ((block.color === 'green' || block.color === 'green2' || block.color === 'key') && dy !== 0) {
+        return false; // Blocchi verdi e chiave possono muoversi solo orizzontalmente
+    }
+
+    // Controlla la collisione con altri blocchi
     for (const otherBlock of blocks) {
         if (otherBlock === block) continue;
 
-        const newBlockWidth = block.width;
-        const newBlockHeight = block.height;
-
-        const otherBlockX = otherBlock.x;
-        const otherBlockY = otherBlock.y;
-        const otherBlockWidth = otherBlock.width;
-        const otherBlockHeight = otherBlock.height;
-
-        if (!(newX + newBlockWidth <= otherBlockX || newX >= otherBlockX + otherBlockWidth ||
-                newY + newBlockHeight <= otherBlockY || newY >= otherBlockY + otherBlockHeight)) {
+        const isColliding = !(newX + block.width <= otherBlock.x ||
+                              newX >= otherBlock.x + otherBlock.width ||
+                              newY + block.height <= otherBlock.y ||
+                              newY >= otherBlock.y + otherBlock.height);
+        if (isColliding) {
             return false;
+        }
+    }
+
+    // Controlla se i blocchi rossi possono essere superati verticalmente
+    if (block.color === 'red' || block.color === 'red2') {
+        for (const otherBlock of blocks) {
+            if (otherBlock === block) continue;
+
+            if (block.x === otherBlock.x) {
+                const isOverlappingVertically = (dy > 0 && newY + block.height > otherBlock.y && block.y < otherBlock.y) ||
+                                                (dy < 0 && newY < otherBlock.y + otherBlock.height && block.y > otherBlock.y);
+                if (isOverlappingVertically) {
+                    // Verifica se la sovrapposizione è completa
+                    const blockTop = block.y;
+                    const blockBottom = block.y + block.height;
+                    const otherBlockTop = otherBlock.y;
+                    const otherBlockBottom = otherBlock.y + otherBlock.height;
+
+                    // Se il blocco rosso è parzialmente o completamente coperto, il movimento non è consentito
+                    if ((dy > 0 && (blockTop < otherBlockBottom && blockBottom > otherBlockTop)) ||
+                        (dy < 0 && (blockTop < otherBlockBottom && blockBottom > otherBlockTop))) {
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+
+    // Controlla se i blocchi verdi o chiave possono superare un blocco rosso nella stessa riga
+    if (block.color === 'green' || block.color === 'green2' || block.color === 'key') {
+        for (const otherBlock of blocks) {
+            if (otherBlock === block) continue;
+
+            if (block.y === otherBlock.y) {
+                const isOverlappingHorizontally = (dx > 0 && newX + block.width > otherBlock.x && block.x < otherBlock.x) ||
+                                                  (dx < 0 && newX < otherBlock.x + otherBlock.width && block.x > otherBlock.x);
+                if (isOverlappingHorizontally) {
+                    if (otherBlock.color === 'red' || otherBlock.color === 'red2') {
+                        return false;
+                    }
+                }
+            }
         }
     }
 
     return true;
 }
+
+
+
 
 function getBlockAt(x, y) {
     return blocks.find(block => x >= block.x && x < block.x + block.width && y >= block.y && y < block.y + block.height);
@@ -185,20 +236,18 @@ function drag(event) {
         const dy = y - initialY - selectedBlock.y;
 
         if (dx !== 0 && dy !== 0) {
-            return;
+            return; // I blocchi non possono muoversi diagonalmente
         }
 
-        if (selectedBlock.color === 'red' || selectedBlock.color === 'red2') {
-            if (dx === 0) {
-                moveBlock(selectedBlock, 0, dy);
-            }
-        } else if (selectedBlock.color === 'green' || selectedBlock.color === 'green2' || selectedBlock.color === 'key') {
-            if (dy === 0) {
-                moveBlock(selectedBlock, dx, 0);
-            }
+        if ((selectedBlock.color === 'red' || selectedBlock.color === 'red2') && dx === 0) {
+            moveBlock(selectedBlock, 0, dy); // I blocchi rossi possono muoversi solo verticalmente
+        } else if ((selectedBlock.color === 'green' || selectedBlock.color === 'green2' || selectedBlock.color === 'key') && dy === 0) {
+            moveBlock(selectedBlock, dx, 0); // I blocchi verdi e chiave possono muoversi solo orizzontalmente
         }
     }
 }
+
+
 
 function endDrag() {
     selectedBlock = null;
