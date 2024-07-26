@@ -300,37 +300,6 @@ function formatDate(date) {
     return `${year}-${month}-${day}`;
 }
 
-function setLevel() {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    const twoDaysAgo = new Date(today);
-
-    if (new Date().getHours() >= 22) {
-        today.setDate(today.getDate() + 1);
-        tomorrow.setDate(today.getDate() + 1);
-        twoDaysAgo.setDate(today.getDate() - 1);
-    } else {
-        tomorrow.setDate(today.getDate() + 1);
-        twoDaysAgo.setDate(today.getDate() - 1);
-    }
-
-    const formattedToday_ = formatDate(today);
-    const formattedTomorrow_ = formatDate(tomorrow);
-    const formattedTwoDaysAgo_ = formatDate(twoDaysAgo);
-
-    const formattedToday = formatDate(today).replace(/-/g, '');
-    const formattedTomorrow = formatDate(tomorrow).replace(/-/g, '');
-    const formattedTwoDaysAgo = formatDate(twoDaysAgo).replace(/-/g, '');
-
-    const levelList = document.getElementById('levelList');
-    levelList.innerHTML = `
-        <li data-level="${formattedTwoDaysAgo}">Level ${formattedTwoDaysAgo_}</li>
-        <li data-level="${formattedToday}" class="active" >Level ${formattedToday_}</li>
-        <li data-level="${formattedTomorrow}" class="disabled" >Level ${formattedTomorrow_}</li>
-        <br>
-        <div class="countdown" id="countdown"></div>
-    `;
-}
 
 // Funzioni di inizializzazione e gestione eventi
 function init() {
@@ -340,12 +309,68 @@ function init() {
     document.addEventListener('DOMContentLoaded', function() {
         setInterval(updateCountdown, 1000);
         updateCountdown();
-        setLevel();
         loadSVGs(drawGame);
-
+    
+        const levelList = document.getElementById('levelList');
+    
+        function getCurrentDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}${month}${day}`;
+        }
+    
+        function addOneDay(dateString) {
+            const year = parseInt(dateString.substring(0, 4), 10);
+            const month = parseInt(dateString.substring(4, 6), 10) - 1;
+            const day = parseInt(dateString.substring(6, 8), 10);
+            const date = new Date(year, month, day);
+            date.setDate(date.getDate() + 1);
+            return `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
+        }
+    
+        function formatDate(dateString) {
+            return `${dateString.substring(0, 4)}-${dateString.substring(4, 6)}-${dateString.substring(6, 8)}`;
+        }
+    
+        const startDate = '20240720'; // Formato string per coerenza
+        let endDate = getCurrentDate();
+    
+        const now = new Date();
+        if (now.getHours() >= 22) {
+            endDate = addOneDay(endDate);
+        }
+    
+        let dateArray = [];
+        for (let date = startDate; date <= endDate; date = addOneDay(date)) {
+            dateArray.push(date);
+        }
+    
+        // Aggiungi un giorno extra e applica la classe 'disabled'
+        const extraDate = addOneDay(endDate);
+        dateArray.push(extraDate);
+    
+        let listItems = '';
+        dateArray.slice().reverse().forEach(date => {
+            const formattedDate = date.toString();
+            if (date === endDate) {
+                listItems += `<li data-level="${formattedDate}" class="active">Level ${formatDate(formattedDate)}</li>`;
+            } else if (date === extraDate) {
+                listItems += `<li data-level="${formattedDate}" class="disabled">Level ${formatDate(formattedDate)}</li>`;
+            } else {
+                listItems += `<li data-level="${formattedDate}">Level ${formatDate(formattedDate)}</li>`;
+            }
+        });
+        
+    
+        levelList.innerHTML = listItems;
+    
         const levelItems = document.querySelectorAll('#levelList li');
         levelItems.forEach(item => {
             item.addEventListener('click', () => {
+                if (item.classList.contains('disabled')) return;
+    
                 const level = item.getAttribute('data-level');
                 const script = document.createElement('script');
                 script.src = `level/${level}.js`;
@@ -353,7 +378,7 @@ function init() {
                     drawGame();
                 };
                 document.head.appendChild(script);
-
+    
                 levelItems.forEach(i => {
                     i.classList.remove('active');
                 });
@@ -361,6 +386,7 @@ function init() {
             });
         });
     });
+    
 
     canvas.addEventListener('mousedown', startDrag);
     canvas.addEventListener('mousemove', drag);

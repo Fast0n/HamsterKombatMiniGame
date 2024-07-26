@@ -1,37 +1,88 @@
+html, body {
+    height: 100%; /* Assicura che l'altezza del body e dell'html siano al 100% */
+    margin: 0; /* Rimuove i margini predefiniti */
+}
+
 body {
     font-family: 'Roboto', sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100vh;
+    justify-content: space-between; /* Spazia uniformemente il contenuto tra l'alto e il basso */
     background-color: #282828;
     margin: 0;
+    overflow: hidden; /* Nasconde la barra di scorrimento */
 }
+
+/* Per browser Webkit (Chrome, Safari, etc.) */
+::-webkit-scrollbar {
+    display: none;
+}
+
+/* Per Firefox */
+html {
+    scrollbar-width: none; /* Nasconde la barra di scorrimento */
+}
+
+html, body {
+    height: 100%; /* Assicura che il body riempia l'intera altezza della finestra */
+    overflow: hidden; /* Nasconde la barra di scorrimento */
+}
+
+
+footer {
+    color: #f4f4f4;
+    background: #4d4d4d;
+    padding: 1em;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Centra il testo del footer */
+    width: calc(100% - 20px); /* Larghezza completa meno margini laterali */
+    margin: 0 5px; /* Spazio ai lati del footer */
+    box-sizing: border-box; /* Include padding e bordo nella larghezza */
+}
+
+footer a {
+    color: #f80;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+button {
+    background-color: white; /* Colore di sfondo blu */
+    color: black; /* Colore del testo */
+    padding: 10px 20px; /* Spaziatura interna */
+    text-align: center; /* Allineamento del testo */
+    text-decoration: none; /* Rimuove la sottolineatura del testo */
+    display: inline-block; /* Consente di impostare larghezza e altezza */
+    font-size: 16px; /* Dimensione del testo */
+    margin: 4px 2px; /* Margine intorno al pulsante */
+    cursor: pointer; /* Mostra una mano quando si passa sopra */
+    border-radius: 4px; /* Angoli arrotondati */
+    border: none; /* Nessun bordo */
+}
+button:hover {
+    background-color: white; /* Colore di sfondo blu scuro al passaggio del mouse */
+}
+
+
 p{
+    color: #f80;
     user-select: none;
+    margin:0px;
+    margin-bottom: 5px;
 }
 h2{
     user-select: none;
 }
 a{
     user-select: none;
-}
-#levelList li {
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    cursor: pointer;
-}
-
-#levelList li:hover {
-    color: inherit; 
-    background-color: inherit; 
-}
-
-#levelList li.active {
-    background-color: #ddd; /* Colore di evidenziazione */
-    color: #000000; /* Colore del testo evidenziato */
 }
 
 
@@ -40,9 +91,11 @@ a{
     border-radius: 8px;
     color: white;
     padding: 10px;
+    margin-top: 10px;
 }
 
 #gameCanvas {
+    
     border: 1px solid #242424;
     display: block;
     border-radius: 15px;
@@ -52,34 +105,37 @@ a{
     margin-top: 20px;
 }
 
-footer {
-    margin-top: 20px;
+
+
+
+ul {
+    list-style: none;
+    height: 123px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    
+    li {
+      height: 25px;
+    }
+}  
+
+
+#levelList li {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    cursor: pointer;
 }
 
-footer a {
-    color: #f80;
-    text-decoration: none;
+#levelList li:hover {
+    background-color: white; /* Colore di evidenziazione */
+    color: #000000; /* Colore del testo evidenziato */
 }
 
-a {
-    color: #f80;
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-footer a:hover {
-    text-decoration: underline;
-}
-
-nav {
-    color: #f4f4f4;
-    background: #4d4d4d;
-    padding: 1em;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
+#levelList li.active {
+    background-color: white; /* Colore di evidenziazione */
+    color: #000000; /* Colore del testo evidenziato */
 }
 
 nav ul {
@@ -91,15 +147,18 @@ nav ul {
 nav ul li {
     padding: 0.5em;
     border-radius: 4px;
+    background: #707070;
+    color: white;
 }
 
 nav ul li:hover {
-    background: #ddd;
+    background: white;
     color: #8d8d8d;
 }
 
 .disabled {
-    color: gray;
+    background: #707070;
+    color: white;
     pointer-events: none;
     opacity: 0.6;
 }

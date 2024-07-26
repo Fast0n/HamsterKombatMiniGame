@@ -1,68 +1,28 @@
+// Variabili globali
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const bufferCanvas = document.createElement('canvas');
 const bufferCtx = bufferCanvas.getContext('2d');
-
-function resizeCanvas() {
-
-    const size = Math.min(window.innerWidth, window.innerHeight / 1.5);
-    canvas.width = size - 15;
-    canvas.height = size - 15;
-}
-// Chiamata iniziale per impostare le dimensioni al caricamento della pagina
-resizeCanvas();
-
-// Aggiungi un listener per ridimensionare il canvas quando la finestra cambia dimensione
-window.addEventListener('resize', resizeCanvas);
-
-const gridSize = 6;
-const cellSize = canvas.width / gridSize;
-
-
-document.addEventListener('DOMContentLoaded', function() {
-
-    
-    loadSVGs(drawGame);
-
-
-});
-
+let gridSize = 6;
+let cellSize;
+let blocks = [];
 const images = {};
-
-function svgToDataURL(svg) {
-    return 'data:image/svg+xml;base64,' + btoa(svg);
-}
-
-function loadSVGs(callback) {
-    let loadedCount = 0;
-    const totalToLoad = Object.keys(svgFiles).length;
-
-    for (const color in svgFiles) {
-        images[color] = new Image();
-        images[color].src = svgToDataURL(svgFiles[color]);
-        images[color].onload = () => {
-            loadedCount++;
-            if (loadedCount === totalToLoad) {
-                callback();
-            }
-        };
-    }
-}
-
-let blocks = []
-
 let selectedBlock = null;
 let initialX = 0;
 let initialY = 0;
 let startTime = null;
 let animationFrameId = null;
+let win = false;
 
-bufferCanvas.width = canvas.width;
-bufferCanvas.height = canvas.height;
-
-function drawBlock(ctx, x, y, width, height, color) {
-    const img = images[color];
-    ctx.drawImage(img, x * cellSize, y * cellSize, width * cellSize, height * cellSize);
+// Funzioni principali
+function resizeCanvas() {
+    const size = Math.min(window.innerWidth, window.innerHeight / 1.5);
+    canvas.width = size - 15;
+    canvas.height = size - 15;
+    bufferCanvas.width = canvas.width;
+    bufferCanvas.height = canvas.height;
+    cellSize = canvas.width / gridSize;
+    drawGame(); // Ridisegna il gioco con le nuove dimensioni
 }
 
 function drawGame() {
@@ -95,28 +55,11 @@ function drawGame() {
     ctx.drawImage(bufferCanvas, 0, 0);
 }
 
-function getBlockAt(x, y) {
-    return blocks.find(block => x >= block.x && x < block.x + block.width && y >= block.y && y < block.y + block.height);
-}
-
-function canMoveBlock(block, dx, dy) {
+function moveBlock(block, dx, dy) {
     const newX = block.x + dx;
     const newY = block.y + dy;
-    for (let x = newX; x < newX + block.width; x++) {
-        for (let y = newY; y < newY + block.height; y++) {
-            if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) {
-                return false;
-            }
-            if (getBlockAt(x, y) && getBlockAt(x, y) !== block) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-function easeInOutCubic(t) {
-    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    
+    animateMove(block, block.x, block.y, newX, newY, performance.now());
 }
 
 function animateMove(block, startX, startY, endX, endY, startTime) {
@@ -147,14 +90,35 @@ function animateMove(block, startX, startY, endX, endY, startTime) {
 
     requestAnimationFrame(step);
 }
-
-function moveBlock(block, dx, dy) {
-    const newX = block.x + dx;
-    const newY = block.y + dy;
-    
-    animateMove(block, block.x, block.y, newX, newY, performance.now());
+// Funzioni di gestione blocchi
+function drawBlock(ctx, x, y, width, height, color) {
+    const img = images[color];
+    ctx.drawImage(img, x * cellSize, y * cellSize, width * cellSize, height * cellSize);
 }
 
+function canMoveBlock(block, dx, dy) {
+    const newX = block.x + dx;
+    const newY = block.y + dy;
+    for (let x = newX; x < newX + block.width; x++) {
+        for (let y = newY; y < newY + block.height; y++) {
+            if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) {
+                return false;
+            }
+            if (getBlockAt(x, y) && getBlockAt(x, y) !== block) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+
+
+function getBlockAt(x, y) {
+    return blocks.find(block => x >= block.x && x < block.x + block.width && y >= block.y && y < block.y + block.height);
+}
+
+// Funzioni di input
 function startDrag(event) {
     const rect = canvas.getBoundingClientRect();
     let x, y;
@@ -185,7 +149,6 @@ function startDrag(event) {
     }
 }
 
-
 function drag(event) {
     if (selectedBlock) {
         const rect = canvas.getBoundingClientRect();
@@ -210,24 +173,100 @@ function drag(event) {
     }
 }
 
+
 function endDrag() {
     selectedBlock = null;
 }
 
-canvas.addEventListener('mousedown', startDrag);
-canvas.addEventListener('mousemove', drag);
-canvas.addEventListener('mouseup', endDrag);
-canvas.addEventListener('touchstart', startDrag);
-canvas.addEventListener('touchmove', drag);
-canvas.addEventListener('touchend', endDrag);
+// Funzioni di utilità
+function svgToDataURL(svg) {
+    return 'data:image/svg+xml;base64,' + btoa(svg);
+}
 
+function loadSVGs(callback) {
+    let loadedCount = 0;
+    const totalToLoad = Object.keys(svgFiles).length;
+
+    for (const color in svgFiles) {
+        images[color] = new Image();
+        images[color].src = svgToDataURL(svgFiles[color]);
+        images[color].onload = () => {
+            loadedCount++;
+            if (loadedCount === totalToLoad) {
+                callback();
+            }
+        };
+    }
+}
+
+function easeInOutCubic(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    return `${year}-${month}-${day}`;
+}
+
+
+// Funzioni di inizializzazione e gestione eventi
+function init() {
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+        loadSVGs(drawGame);
+    
+        
+    });
+    
+
+    canvas.addEventListener('mousedown', startDrag);
+    canvas.addEventListener('mousemove', drag);
+    canvas.addEventListener('mouseup', endDrag);
+    canvas.addEventListener('touchstart', startDrag);
+    canvas.addEventListener('touchmove', drag);
+    canvas.addEventListener('touchend', endDrag);
+
+    function preventDefault(event) {
+        event.preventDefault();
+    }
+
+    function addEventListenerCompat(element, event, handler, options) {
+        if (element.addEventListener) {
+            element.addEventListener(event, handler, options);
+        } else if (element.attachEvent) {
+            element.attachEvent('on' + event, handler);
+        }
+    }
+
+    // Prevenire lo scrolling della pagina su touchmove
+    addEventListenerCompat(canvas, 'touchmove', preventDefault, {
+        passive: false
+    });
+
+    // Prevenire lo scrolling della pagina su wheel
+    addEventListenerCompat(canvas, 'wheel', preventDefault, {
+        passive: false
+    });
+}
+
+// Avvia l'inizializzazione
+init();
 
 document.getElementById("save").addEventListener("click", function() {
-    
-        // Copia negli appunti
-        navigator.clipboard.writeText('blocks = ' + JSON.stringify(blocks, null, 0)).then(function() {
-            
-        }, function(err) {
-            console.error('Errore durante la copia negli appunti: ', err);
-        });
+    // Rimuovi tutte le proprietà clickCount da ogni oggetto in blocks
+    blocks.forEach(block => {
+        delete block.clickCount;
+    });
+
+    // Copia negli appunti
+    navigator.clipboard.writeText('blocks = ' + JSON.stringify(blocks, null, 1)).then(function() {
+        console.log('Copia negli appunti riuscita.');
+    }, function(err) {
+        console.error('Errore durante la copia negli appunti: ', err);
+    });
 });
