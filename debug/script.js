@@ -241,17 +241,13 @@ function drawBlock(ctx, x, y, width, height, color) {
 function canMoveBlock(block, dx, dy) {
     const newX = block.x + dx;
     const newY = block.y + dy;
-    for (let x = newX; x < newX + block.width; x++) {
-        for (let y = newY; y < newY + block.height; y++) {
-            if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) {
-                return false;
-            }
-            if (getBlockAt(x, y) && getBlockAt(x, y) !== block) {
-                return false;
-            }
-        }
+    
+    // Verifica che il blocco non esca dai limiti della griglia
+    if (newX < 0 || newY < 0 || newX + block.width > gridSize || newY + block.height > gridSize) {
+        return false;
     }
-    return true;
+
+
 }
 
 
@@ -278,7 +274,7 @@ function startDrag(event) {
         initialX = x - selectedBlock.x;
         initialY = y - selectedBlock.y;
         selectedBlock.clickCount = (selectedBlock.clickCount || 0) + 1;
-        if (selectedBlock.clickCount === 3) {
+        if (selectedBlock.clickCount === 5) {
             if (confirm("Sei sicuro di voler cancellare questo blocco?")) {
                 blocks = blocks.filter(block => block !== selectedBlock);
                 selectedBlock = null;

@@ -1,5 +1,4 @@
 import re
-import argparse
 from datetime import datetime, timedelta
 import shutil
 import os
@@ -41,13 +40,11 @@ def transform_js_to_python(js_file):
 
 # Configura argparse per gestire l'input del nome del file
 def main():
-    parser = argparse.ArgumentParser(description='Trasforma una variabile JS in blocks = []')
-    parser.add_argument('input_file', type=str, help='Nome del file JS')
-    
-    args = parser.parse_args()
+
+
     
     # Esegui la trasformazione
-    file_name = transform_js_to_python(args.input_file)
+    file_name = transform_js_to_python("daily.js")
     
     
     # Ottieni la directory in cui si trova questo script
