@@ -9,9 +9,16 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: space-between; /* Spazia uniformemente il contenuto tra l'alto e il basso */
-    background-color: #282828;
+    background-color: #202020;
     margin: 0;
-    overflow: hidden; /* Nasconde la barra di scorrimento */
+    overflow: hidden;  /*Nasconde la barra di scorrimento */
+}
+
+br{
+    
+    display: block; /* makes it have a width */
+    content: ""; /* clears default height */
+    margin-top: 10px; /* change this to whatever height you want it */
 }
 
 /* Per browser Webkit (Chrome, Safari, etc.) */
@@ -73,7 +80,7 @@ button:hover {
 
 
 p{
-    color: #f80;
+    color: #afafaf;
     user-select: none;
     margin:0px;
     margin-bottom: 5px;
@@ -91,7 +98,6 @@ a{
     border-radius: 8px;
     color: white;
     padding: 10px;
-    margin-top: 10px;
 }
 
 #gameCanvas {
@@ -99,10 +105,6 @@ a{
     border: 1px solid #424242;
     display: block;
     border-radius: 5px;
-}
-
-.info-panel {
-    margin-top: 20px;
 }
 
 
@@ -162,3 +164,5 @@ nav ul li:hover {
     pointer-events: none;
     opacity: 0.6;
 }
+
+

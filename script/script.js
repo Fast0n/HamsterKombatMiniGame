@@ -33,10 +33,10 @@ function resizeCanvas() {
 function drawGame() {
     // Pulire il canvas di buffer
     bufferCtx.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
-    bufferCtx.fillStyle = '#242424';
+    bufferCtx.fillStyle = '#282828';
     bufferCtx.fillRect(0, 0, bufferCanvas.width, bufferCanvas.height);
 
-    const starSize = 5; // Dimensione della stella (controlla le dimensioni complessive)
+    const starSize = 4; // Dimensione della stella (controlla le dimensioni complessive)
 
     function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius) {
         const step = Math.PI / spikes;
