@@ -3,81 +3,81 @@ from datetime import datetime, timedelta
 import shutil
 import os
 
-# Funzione per estrarre e trasformare i dati
-def transform_js_to_python(js_file):
+# Function to extract and transform the data
+def transform_js_to_python(js_file, new_file_name):
     with open(js_file, 'r') as file:
         content = file.read()
     
-    # Trova e estrae l'array di oggetti
+    # Find and extract the array of objects
     match = re.search(r'blocks\s*=\s*\[(.*?)]', content, re.DOTALL)
     if match:
         blocks_content = match.group(1)
         
-        # Rimuovi gli spazi e le nuove righe in eccesso
+        # Remove excessive spaces and new lines
         blocks_content = re.sub(r'\s+', ' ', blocks_content).strip()
         
-        # Aggiungi una nuova riga dopo ogni '},'
+        # Add a new line after each '},'
         blocks_content = re.sub(r'},\s*', '},\n    ', blocks_content)
         
-        # Converti le virgolette doppie in singole
+        # Convert double quotes to single quotes
         blocks_content = blocks_content.replace('"', "'")
-        
-        # Ottieni la data attuale nel formato YYYYMMDD
-        current_date = datetime.now()
-        # Aggiungi un giorno
-        tomorrow_date = current_date + timedelta(days=1)
-        
-        current_date = tomorrow_date.strftime('%Y%m%d')
-        new_file_name = f"{current_date}.js"
-        
-        # Scrivi il risultato nel nuovo file
+      
+        # Write the result to the new file
         with open(new_file_name, 'w') as file:
             file.write(f"blocks = [\n    {blocks_content}]")
-            
-        return new_file_name
+
     else:
-        print("Impossibile trovare la dichiarazione dell'array 'blocks' nel file.")
+        print("Unable to find the 'blocks' array declaration in the file.")
+        
+# Function to find the latest file in the 'level' folder
+def find_latest_file(directory):
+    files = os.listdir(directory)
+    files = [f for f in files if os.path.isfile(os.path.join(directory, f))]
+    files.sort(key=lambda x: os.path.getmtime(os.path.join(directory, x)), reverse=True)
+    return files[0] if files else None
 
-# Configura argparse per gestire l'input del nome del file
+# Main function
 def main():
-
-
-    
-    # Esegui la trasformazione
-    file_name = transform_js_to_python("daily.js")
-    
-    
-    # Ottieni la directory in cui si trova questo script
+    # Get the directory where this script is located
     current_directory = os.path.dirname(os.path.abspath(__file__))
 
-    # Costruisci i percorsi relativi per le cartelle
-    source_folder = current_directory  # La cartella 'debug'
-    destination_folder = os.path.join(current_directory, '..', 'level')  # La cartella 'level' è un livello sopra
-    destination_folder_daily = os.path.join(current_directory, '..', 'script')  # La cartella 'level' è un livello sopra
-    
+    # Build relative paths for the folders
+    source_folder = current_directory  # The 'debug' folder
+    destination_folder = os.path.join(current_directory, '..', 'level')  # The 'level' folder is one level up
+    destination_folder_daily = os.path.join(current_directory, '..', 'script')  # The 'script' folder is one level up
 
-    # Risolvi i percorsi assoluti
+    # Resolve absolute paths
     source_folder = os.path.abspath(source_folder)
     destination_folder = os.path.abspath(destination_folder)
     destination_folder_daily = os.path.abspath(destination_folder_daily)
     
+    latest_file = find_latest_file(destination_folder)
+    data_str = latest_file.replace('.js', '')
+    
+    # Convert the string to a datetime object
+    data = datetime.strptime(data_str, '%Y%m%d')
 
-    # Percorsi completi del file
+    # Add one day
+    incremented_date = data + timedelta(days=1)
+
+    # Convert back to string in the desired format, e.g., 'YYYYMMDD'
+    file_name = incremented_date.strftime('%Y%m%d') + '.js'
+    
+    # Full paths for the file
     source_path = os.path.join(source_folder, file_name)
     destination_path = os.path.join(destination_folder, file_name)
-    destination_folder_daily = os.path.join(destination_folder_daily, 'daily.js')
+    destination_file_daily = os.path.join(destination_folder_daily, 'daily.js')
     
+    transform_js_to_python(destination_file_daily, file_name)
 
-    # Spostamento del file
     try:
-        shutil.copy(source_path, destination_folder_daily) 
+        shutil.copy(source_path, destination_file_daily)
         shutil.move(source_path, destination_path)
-        print(f'Fatto')
+        print('Done')
     except FileNotFoundError:
-        print(f'Il file {file_name} non è stato trovato nella cartella {source_folder}')
+        print(f'The file {file_name} was not found in the folder {source_folder}')
     except Exception as e:
-        print(f'Si è verificato un errore: {e}')
-
+        print(f'An error occurred: {e}')
 
 if __name__ == '__main__':
     main()
