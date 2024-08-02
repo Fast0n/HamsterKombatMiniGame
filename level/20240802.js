@@ -9,5 +9,5 @@ blocks = [
     { 'x': 2, 'y': 1, 'color': 'green', 'width': 2, 'height': 1 },
     { 'x': 4, 'y': 0, 'color': 'red2', 'width': 1, 'height': 3 },
     { 'x': 4, 'y': 5, 'color': 'green', 'width': 2, 'height': 1 },
-    { 'x': 5, 'y': 0, 'color': 'red2', 'width': 1, 'height': 3 },
+    { 'x': 5, 'y': 2, 'color': 'red2', 'width': 1, 'height': 3 },
     { 'x': 3, 'y': 3, 'color': 'green', 'width': 2, 'height': 1 }]

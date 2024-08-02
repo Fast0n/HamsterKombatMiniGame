@@ -8,7 +8,66 @@
     <title>Hamster Combat Mini Game</title>
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <style>
+
+        
+br{
+    
+    display: block; /* makes it have a width */
+    content: ""; /* clears default height */
+    margin-top: -6px; /* change this to whatever height you want it */
+}
+
+        .button-group {
+            margin-bottom: 10px;
+        }
+
+        .button-group button {
+            margin-right: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #red {
+            background-color: #93282b;
+            color: white;
+        }
+
+        #red2 {
+            background-color: #93282b;
+            color: white;
+        }
+
+        #green {
+            background-color: #3d6535;
+            color: white;
+        }
+
+        #green2 {
+            background-color: #3d6535;
+            color: white;
+        }
+
+        #key {
+            background-color: #c98f02;
+            color: white;
+        }
+
+        #erase {
+            background-color: darkgray;
+            color: white;
+        }
+
+        #save {
+            background-color: blue;
+            color: white;
+        }
+    </style>
 </head>
+
+
 
 <body>
 
@@ -16,15 +75,31 @@
         <canvas id="gameCanvas" width="330" height="330"></canvas>
     </div>
         <footer>
+            <div class="button-group">
+                <button id="red">🟥<br>🟥</button>
+                <button id="red2">🟥<br>🟥<br>🟥</button>
+            </div>
+            
+            <div class="button-group">
+                <button id="green">🟩<span style="font-size: 0; margin: 0 -4px;"></span>🟩</button>
+                <button id="green2">🟩<span style="font-size: 0; margin: 0 -4px;"></span>🟩<span style="font-size: 0; margin: 0 -4px;"></span>🟩</button>
+            </div>
+            
+            <div class="button-group">
+                <button id="key">🔑</button>
+                <button id="erase">🗑</button>
+            </div>
+            
+            <div class="button-group">
+                <button id="save">Generate and copy</button>
+            </div>
             <nav>
-                <button id="save" type="button">Generate and copy</button>
                 <br>
                 created with love by <a href="https://github.com/Fast0n/HamsterKombatMiniGame" target="_blank">fast0n</a>
             </nav>
         </footer>
     <script src="../script/svgImage.js"></script>
     <script src="script.js"></script>
-    <script src="daily.js"></script>
 </body>
 
 </html>

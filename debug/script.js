@@ -126,8 +126,11 @@ function drawGame() {
 function moveBlock(block, dx, dy) {
     const newX = block.x + dx;
     const newY = block.y + dy;
-    
-    animateMove(block, block.x, block.y, newX, newY, performance.now());
+
+    if (canMoveBlock(block, dx, dy)) {
+        // Solo se il movimento è valido, avvia l'animazione
+        animateMove(block, block.x, block.y, newX, newY, performance.now());
+    }
 }
 
 function animateMove(block, startX, startY, endX, endY, startTime) {
@@ -164,7 +167,7 @@ function drawBlock(ctx, x, y, width, height, color) {
     const drawY = y * cellSize + padding;
     const drawWidth = width * cellSize - 2 * padding;
     const drawHeight = height * cellSize - 2 * padding;
-    
+
     // Determina il colore di sfondo in base al colore del blocco
     let backgroundColor;
     if (color === 'red' || color === 'red2') {
@@ -174,7 +177,6 @@ function drawBlock(ctx, x, y, width, height, color) {
     } else if (color === 'key') {
         backgroundColor = "rgba(62, 59, 37, 0.5)"; // Colore di sfondo per blocchi chiave con 50% di trasparenza
     }
-
 
     // Salva il contesto corrente
     ctx.save();
@@ -238,17 +240,30 @@ function drawBlock(ctx, x, y, width, height, color) {
     ctx.stroke();
     ctx.restore();
 }
+
+
+
 function canMoveBlock(block, dx, dy) {
     const newX = block.x + dx;
     const newY = block.y + dy;
-    
+
     // Verifica che il blocco non esca dai limiti della griglia
-    if (newX < 0 || newY < 0 || newX + block.width > gridSize || newY + block.height > gridSize) {
+    if (newX < 0 || newY < 0 ||
+        newX + block.width > gridSize ||
+        newY + block.height > gridSize) {
         return false;
     }
 
+    // Verifica che il blocco non esca dai limiti del canvas
+    if (newX < 0 || newY < 0 ||
+        newX + block.width * cellSize > canvas.width ||
+        newY + block.height * cellSize > canvas.height) {
+        return false;
+    }
 
+    return true;
 }
+
 
 
 
@@ -274,16 +289,6 @@ function startDrag(event) {
         initialX = x - selectedBlock.x;
         initialY = y - selectedBlock.y;
         selectedBlock.clickCount = (selectedBlock.clickCount || 0) + 1;
-        if (selectedBlock.clickCount === 5) {
-            if (confirm("Sei sicuro di voler cancellare questo blocco?")) {
-                blocks = blocks.filter(block => block !== selectedBlock);
-                selectedBlock = null;
-                drawGame();
-            } else {
-                selectedBlock.clickCount = 0; // Reset del contatore se la cancellazione è annullata
-            }
-            return;
-        }
     }
 }
 
@@ -395,6 +400,51 @@ function init() {
 // Avvia l'inizializzazione
 init();
 
+// Funzione per aggiungere un blocco
+function addBlock(x, y, color, width, height) {
+    blocks.push({ x, y, color, width, height });
+    drawGame(); // Ridisegna il gioco dopo aver aggiunto il blocco
+}
+
+// Funzione per rimuovere l'ultimo blocco
+function removeLastBlock() {
+    if (blocks.length > 0) {
+        blocks.pop(); // Rimuovi l'ultimo blocco dall'array
+        drawGame(); // Ridisegna il gioco dopo aver rimosso il blocco
+    }
+}
+
+// Gestore di eventi per il pulsante 'red'
+document.getElementById("red").addEventListener("click", function() {
+    // Aggiungi un blocco rosso al canvas
+    addBlock(0, 0, 'red', 1, 2);
+});
+
+// Gestore di eventi per il pulsante 'red2'
+document.getElementById("red2").addEventListener("click", function() {
+    // Aggiungi un blocco rosso al canvas
+    addBlock(0, 0, 'red2', 1, 3);
+});
+
+// Gestore di eventi per il pulsante 'green'
+document.getElementById("green").addEventListener("click", function() {
+    // Aggiungi un blocco verde al canvas
+    addBlock(0, 0, 'green', 2, 1);
+});
+
+// Gestore di eventi per il pulsante 'green2'
+document.getElementById("green2").addEventListener("click", function() {
+    // Aggiungi un blocco verde chiaro al canvas
+    addBlock(0, 0, 'green2', 3, 1);
+});
+
+// Gestore di eventi per il pulsante 'key'
+document.getElementById("key").addEventListener("click", function() {
+    // Aggiungi un blocco 'key' al canvas
+    addBlock(0, 0, 'key', 2, 1);
+});
+
+// Gestore di eventi per il pulsante 'save'
 document.getElementById("save").addEventListener("click", function() {
     // Rimuovi tutte le proprietà clickCount da ogni oggetto in blocks
     blocks.forEach(block => {
@@ -407,4 +457,10 @@ document.getElementById("save").addEventListener("click", function() {
     }, function(err) {
         console.error('Errore durante la copia negli appunti: ', err);
     });
+});
+
+// Gestore di eventi per il pulsante 'erase'
+document.getElementById("erase").addEventListener("click", function() {
+    // Rimuovi l'ultimo blocco
+    removeLastBlock();
 });
