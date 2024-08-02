@@ -64,16 +64,22 @@ def main():
     file_name = incremented_date.strftime('%Y%m%d') + '.js'
     
     # Full paths for the file
+    source_path_file = os.path.join(source_folder, 'daily.js')
     source_path = os.path.join(source_folder, file_name)
+    
     destination_path = os.path.join(destination_folder, file_name)
     destination_file_daily = os.path.join(destination_folder_daily, 'daily.js')
     
-    transform_js_to_python(destination_file_daily, file_name)
+    transform_js_to_python(source_path_file, file_name)
+    
+
 
     try:
         shutil.copy(source_path, destination_file_daily)
         shutil.move(source_path, destination_path)
         print('Done')
+        os.system("git checkout daily.js")
+        
     except FileNotFoundError:
         print(f'The file {file_name} was not found in the folder {source_folder}')
     except Exception as e:
