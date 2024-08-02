@@ -452,8 +452,9 @@ document.getElementById("save").addEventListener("click", function() {
     });
 
     // Copia negli appunti
-    navigator.clipboard.writeText('blocks = ' + JSON.stringify(blocks, null, 1)).then(function() {
+    navigator.clipboard.writeText('blocks = ' + JSON.stringify(blocks, null, 0)).then(function() {
         console.log('Copia negli appunti riuscita.');
+        window.open("https://t.me/+7BENd-9CdiJiZWU0");
     }, function(err) {
         console.error('Errore durante la copia negli appunti: ', err);
     });
