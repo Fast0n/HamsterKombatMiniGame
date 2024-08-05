@@ -15,9 +15,9 @@ let animationFrameId = null;
 let win = false;
 
 // Variabili da aggiungere
-const borderRadius = 4;
-const padding = 2;
-const borderWidth = 2; // Larghezza del bordo
+const borderRadius = 3;
+const padding = 1.5;
+const borderWidth = 1.5; // Larghezza del bordo
 
 // Funzioni principali
 function resizeCanvas() {
