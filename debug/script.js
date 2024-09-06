@@ -20,6 +20,44 @@ const borderRadius = 4;
 const padding = 2;
 const borderWidth = 2; // Larghezza del bordo
 
+
+
+
+function createStringFromBlocks(blocks) {
+    // Inizializza la griglia vuota 6x6 con il carattere 'o'
+    let griglia = Array.from({ length: 6 }, () => Array(6).fill('o'));
+
+    // Lista di lettere disponibili partendo da B, saltando la A
+    let lettereDisponibili = [...'BCDEFGHIJKLMNOPQRSTUVWXYZB'];
+
+    // Indice per scorrere attraverso le lettere
+    let indiceLettere = 0;
+
+    // Itera sui blocchi per posizionare i caratteri nella griglia
+    blocks.forEach(block => {
+        let { x, y, width, height, color } = block;
+
+        // Assegna 'A' se il colore è 'key', altrimenti prendi una lettera in ordine
+        let char = color === 'key' ? 'A' : lettereDisponibili[indiceLettere];
+        if (color !== 'key') {
+            indiceLettere = (indiceLettere + 1) % lettereDisponibili.length;
+        }
+
+        // Popola la griglia con il carattere
+        for (let dy = 0; dy < height; dy++) {
+            for (let dx = 0; dx < width; dx++) {
+                griglia[y + dy][x + dx] = char;
+            }
+        }
+    });
+
+    // Combina tutte le righe della griglia in una stringa
+    let stringa = griglia.map(riga => riga.join('')).join('');
+    
+    return stringa;
+}
+
+
 // Funzioni principali
 function resizeCanvas() {
     const size = Math.min(window.innerWidth, window.innerHeight / 1.5);
@@ -451,9 +489,20 @@ document.getElementById("save").addEventListener("click", function() {
         delete block.clickCount;
     });
 
+
+    // Converti la stringa JSON in un array di oggetti
+    let blocksString = JSON.parse(JSON.stringify(blocks, null, 0));
+        
+    // Ora puoi usare la funzione con la variabile blocks
+    const resultString = createStringFromBlocks(blocksString);
+
     // Copia negli appunti
-    navigator.clipboard.writeText('blocks = ' + JSON.stringify(blocks, null, 0)).then(function() {
+    navigator.clipboard.writeText(resultString).then(function() {
         console.log('Copia negli appunti riuscita.');
+        var inputField = document.getElementById("levelgen");
+
+        inputField.value = resultString;
+
         window.open("https://t.me/+7BENd-9CdiJiZWU0");
     }, function(err) {
         console.error('Errore durante la copia negli appunti: ', err);
