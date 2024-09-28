@@ -19,6 +19,19 @@ const borderRadius = 3;
 const padding = 1.5;
 const borderWidth = 1.5; // Larghezza del bordo
 
+function showSeason(season) {
+    // Hide both lists initially
+    document.getElementById('levelList').style.display = 'none';
+    document.getElementById('levelList2').style.display = 'none';
+    
+    // Show the selected season's list
+    if (season === 'season1') {
+        document.getElementById('levelList').style.display = 'block';
+    } else if (season === 'season2') {
+        document.getElementById('levelList2').style.display = 'block';
+    }
+}
+
 // Funzioni principali
 function resizeCanvas() {
     const size = Math.min(window.innerWidth, window.innerHeight / 1.5);
@@ -450,9 +463,37 @@ function init() {
         setInterval(updateCountdown, 1000);
         updateCountdown();
         loadSVGs(drawGame);
-
+    
         const levelList = document.getElementById('levelList');
-
+        const levelList2 = document.getElementById('levelList2');
+    
+        const startDate = '20240720';
+        const endDate = '20240920';
+        const startDate2 = '20240921';
+        let endDate2 = getCurrentDate();
+    
+        // Aggiungi un giorno extra se sono passate le 22
+        const now = new Date();
+        if (now.getHours() >= 22) {
+            endDate2 = addOneDay(endDate2);
+        }
+    
+        const extraDate = addOneDay(endDate2);
+    
+        // Popola le liste di date per la season 1 e 2
+        const dateArray = generateDateArray(startDate, endDate);
+        const dateArray2 = generateDateArray(startDate2, endDate2);
+        dateArray2.push(extraDate); // aggiungi giorno extra alla season 2
+    
+        // Aggiorna l'HTML delle liste
+        levelList.innerHTML = generateListHTML(dateArray, endDate, extraDate);
+        levelList2.innerHTML = generateListHTML(dateArray2, endDate2, extraDate);
+    
+        // Aggiungi eventi click alle liste
+        addClickEventsToList(levelList);
+        addClickEventsToList(levelList2);
+    
+        // Funzioni ausiliarie
         function getCurrentDate() {
             const today = new Date();
             const year = today.getFullYear();
@@ -460,7 +501,7 @@ function init() {
             const day = String(today.getDate()).padStart(2, '0');
             return `${year}${month}${day}`;
         }
-
+    
         function addOneDay(dateString) {
             const year = parseInt(dateString.substring(0, 4), 10);
             const month = parseInt(dateString.substring(4, 6), 10) - 1;
@@ -469,63 +510,56 @@ function init() {
             date.setDate(date.getDate() + 1);
             return `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
         }
-
+    
         function formatDate(dateString) {
             return `${dateString.substring(0, 4)}-${dateString.substring(4, 6)}-${dateString.substring(6, 8)}`;
         }
-
-        const startDate = '20240720'; // Formato string per coerenza
-        let endDate = getCurrentDate();
-
-        const now = new Date();
-        if (now.getHours() >= 22) {
-            endDate = addOneDay(endDate);
-        }
-
-        let dateArray = [];
-        for (let date = startDate; date <= endDate; date = addOneDay(date)) {
-            dateArray.push(date);
-        }
-
-        // Aggiungi un giorno extra e applica la classe 'disabled'
-        const extraDate = addOneDay(endDate);
-        dateArray.push(extraDate);
-
-        let listItems = '';
-        dateArray.slice().reverse().forEach(date => {
-            const formattedDate = date.toString();
-            if (date === endDate) {
-                listItems += `<li data-level="${formattedDate}" class="active">Level ${formatDate(formattedDate)}</li>`;
-            } else if (date === extraDate) {
-                listItems += `<li data-level="${formattedDate}" class="disabled">Level ${formatDate(formattedDate)}</li>`;
-            } else {
-                listItems += `<li data-level="${formattedDate}">Level ${formatDate(formattedDate)}</li>`;
+    
+        function generateDateArray(startDate, endDate) {
+            let dateArray = [];
+            for (let date = startDate; date <= endDate; date = addOneDay(date)) {
+                dateArray.push(date);
             }
-        });
-
-
-        levelList.innerHTML = listItems;
-
-        const levelItems = document.querySelectorAll('#levelList li');
-        levelItems.forEach(item => {
-            item.addEventListener('click', () => {
-                if (item.classList.contains('disabled')) return;
-
-                const level = item.getAttribute('data-level');
-                const script = document.createElement('script');
-                script.src = `level/${level}.js`;
-                script.onload = () => {
-                    drawGame();
-                };
-                document.head.appendChild(script);
-
-                levelItems.forEach(i => {
-                    i.classList.remove('active');
+            return dateArray;
+        }
+    
+        function generateListHTML(dateArray, activeDate, extraDate) {
+            return dateArray.slice().reverse().map(date => {
+                const formattedDate = date.toString();
+                if (date === activeDate) {
+                    return `<li data-level="${formattedDate}" class="active">Level ${formatDate(formattedDate)}</li>`;
+                } else if (date === extraDate) {
+                    return `<li data-level="${formattedDate}" class="disabled">Level ${formatDate(formattedDate)}</li>`;
+                } else {
+                    return `<li data-level="${formattedDate}">Level ${formatDate(formattedDate)}</li>`;
+                }
+            }).join('');
+        }
+    
+        function addClickEventsToList(listElement) {
+            const levelItems = listElement.querySelectorAll('li');
+            levelItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    if (item.classList.contains('disabled')) return;
+    
+                    const level = item.getAttribute('data-level');
+                    loadLevelScript(level);
+    
+                    // Rimuovi la classe 'active' da tutti gli elementi e aggiungila all'elemento cliccato
+                    levelItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
                 });
-                item.classList.add('active');
             });
-        });
+        }
+    
+        function loadLevelScript(level) {
+            const script = document.createElement('script');
+            script.src = `level/${level}.js`;
+            script.onload = drawGame;
+            document.head.appendChild(script);
+        }
     });
+    
 
 
     canvas.addEventListener('mousedown', startDrag);

@@ -141,6 +141,26 @@ ul {
     color: #000000; /* Colore del testo evidenziato */
 }
 
+
+#levelList2 li {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    cursor: pointer;
+}
+
+#levelList2 li:hover {
+    background-color: white; /* Colore di evidenziazione */
+    color: #000000; /* Colore del testo evidenziato */
+}
+
+#levelList2 li.active {
+    border-radius: 4px;
+    background-color: white; /* Colore di evidenziazione */
+    color: #000000; /* Colore del testo evidenziato */
+}
+
 nav ul {
     list-style: none;
     padding: 0;

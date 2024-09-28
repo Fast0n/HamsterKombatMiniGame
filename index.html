@@ -22,18 +22,34 @@
     </div>
     <footer>
         <nav>
-            <p>Scroll to view older levels</p>
-            <ul id="levelList">
+            <p>Scroll to view levels</p>
+    
+            <!-- Buttons for Season Selection -->
+            <button id="season2Btn" onclick="showSeason('season2')">SEASON 2</button>
+            <button id="season1Btn" onclick="showSeason('season1')">SEASON 1</button>
+    
+            <!-- SEASON 1 Levels -->
+            <ul id="levelList" style="display: none;">
                 <li data-level="20240720">Level 2024-07-20</li>
                 <li data-level="20240721" class="active">Level 2024-07-21</li>
                 <li data-level="20240722" class="disabled">Level 2024-07-22</li>
             </ul>
+    
+            <!-- SEASON 2 Levels -->
+            <ul id="levelList2">
+                <li data-level="20240921">Level 2024-09-21</li>
+                <li data-level="20240922" class="active">Level 2024-09-22</li>
+                <li data-level="20240923" class="disabled">Level 2024-09-23</li>
+            </ul>
+    
             <br>
             <div class="countdown" id="countdown"></div>
             <br>
-            created with love by <a href="https://github.com/Fast0n/HamsterKombatMiniGame" target="_blank">fast0n</a>
+            created with love by 
+            <a href="https://github.com/Fast0n/HamsterKombatMiniGame" target="_blank">fast0n</a>
         </nav>
     </footer>
+    
 
     <script src="script/svgImage.js"></script>
     <script src="script/script.js"></script>
