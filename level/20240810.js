@@ -11,3 +11,5 @@ blocks = [
     {'x':2,'y':4,'color':'red','width':1,'height':2},
     {'x':3,'y':4,'color':'green','width':2,'height':1},
     {'x':5,'y':4,'color':'red','width':1,'height':2}]
+
+fspv = 'oBoCCooBDDEFoAAHEFIJJHEoIoKLLMIoKooM'

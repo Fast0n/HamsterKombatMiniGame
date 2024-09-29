@@ -62,8 +62,8 @@ footer a:hover {
 }
 
 button {
-    background-color: white; /* Colore di sfondo blu */
-    color: black; /* Colore del testo */
+    background-color: #f80; /* Colore di sfondo blu */
+    color: #4d4d4d; /* Colore del testo */
     padding: 10px 20px; /* Spaziatura interna */
     text-align: center; /* Allineamento del testo */
     text-decoration: none; /* Rimuove la sottolineatura del testo */

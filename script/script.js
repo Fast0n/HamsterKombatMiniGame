@@ -6,6 +6,7 @@ const bufferCtx = bufferCanvas.getContext('2d');
 let gridSize = 6;
 let cellSize;
 let blocks = [];
+let fspv = '';
 const images = {};
 let selectedBlock = null;
 let initialX = 0;
@@ -44,6 +45,8 @@ function resizeCanvas() {
 }
 
 function drawGame() {
+
+
     // Pulire il canvas di buffer
     bufferCtx.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
     bufferCtx.fillStyle = '#282828';
@@ -128,6 +131,12 @@ function drawGame() {
     blocks.forEach(block => {
         drawBlock(bufferCtx, block.x, block.y, block.width, block.height, block.color);
     });
+    const fspv_element = document.getElementById('fspv');
+    fspv_element.innerHTML = fspv
+    fspv_element.href='https://fspv.github.io/hamster-kombat-puzzle-sim/index.html#'+fspv
+
+
+
 
     // Disegna il buffer sul canvas principale
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -374,6 +383,7 @@ function startDrag(event) {
         initialX = x - selectedBlock.x;
         initialY = y - selectedBlock.y;
     }
+    
 }
 
 // Funzione di drag e drop aggiornata
@@ -488,6 +498,8 @@ function init() {
         // Aggiorna l'HTML delle liste
         levelList.innerHTML = generateListHTML(dateArray, endDate, extraDate);
         levelList2.innerHTML = generateListHTML(dateArray2, endDate2, extraDate);
+
+       
     
         // Aggiungi eventi click alle liste
         addClickEventsToList(levelList);
