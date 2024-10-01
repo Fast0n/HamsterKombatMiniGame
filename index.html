@@ -22,14 +22,18 @@
     </div>
     <footer>
         <nav>
-            <a id='fspv' style="font-size: 14px;" href="" target="_blank"></a>
+            <div class="code-display">
+                <a id='fspv' style="font-size: 14px;" href="" target="_blank"></a>
+            </div>
             <br>
-            <p>Scroll to view levels</p>
 
             <!-- Buttons for Season Selection -->
-            <button id="season2Btn" onclick="showSeason('season2')">SEASON 2</button>
-            <button id="season1Btn" onclick="showSeason('season1')">SEASON 1</button>
-    
+            <div class="season-buttons">
+            <button id="season2Btn" onclick="showSeason('season2')" class="season-button active" >SEASON 2</button>
+            <button id="season1Btn" onclick="showSeason('season1')" class="season-button">SEASON 1</button>
+            </div>
+            <p>Scroll to view levels</p>
+
             <!-- SEASON 1 Levels -->
             <ul id="levelList" style="display: none;">
                 <li data-level="20240720">Level 2024-07-20</li>
@@ -45,10 +49,12 @@
             </ul>
     
             <br>
-            <div class="countdown" id="countdown"></div>
-            <br>
-            created with love by 
-            <a href="https://github.com/Fast0n/HamsterKombatMiniGame" target="_blank">fast0n</a>
+            <div class="footer">
+                <div><div class="countdown" id="countdown"></div></div>
+                <div>created with love by <strong> <a href="https://github.com/Fast0n/HamsterKombatMiniGame" target="_blank">fast0n</strong></a></div>
+            </div>
+
+            
         </nav>
     </footer>
     

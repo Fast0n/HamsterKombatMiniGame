@@ -25,6 +25,11 @@ function showSeason(season) {
     document.getElementById('levelList').style.display = 'none';
     document.getElementById('levelList2').style.display = 'none';
     
+
+    const buttons = document.querySelectorAll('.season-button');
+    buttons.forEach(button => button.classList.remove('active'));
+    event.target.classList.add('active');
+
     // Show the selected season's list
     if (season === 'season1') {
         document.getElementById('levelList').style.display = 'block';
@@ -45,6 +50,10 @@ function resizeCanvas() {
 }
 
 function drawGame() {
+
+    
+
+
 
 
     // Pulire il canvas di buffer
@@ -466,6 +475,7 @@ function formatDate(date) {
 
 // Funzioni di inizializzazione e gestione eventi
 function init() {
+
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
@@ -606,3 +616,6 @@ function init() {
 
 // Avvia l'inizializzazione
 init();
+
+
+
